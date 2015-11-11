@@ -1,0 +1,16 @@
+<head>
+  <title>Market Dapp</title>
+</head>
+
+<template name="mainLayout">
+  <header class="dapp-header">
+    <h1 class="dapp-title">Market Dapp</h1>
+    {{> navbar}}
+  </header>
+  <div class="dapp-flex-content">
+    <main class="dapp-content">
+      {{> Template.dynamic template=main}}
+    </main>
+  </div>
+</template>
+

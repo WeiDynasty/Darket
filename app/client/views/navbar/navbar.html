@@ -1,0 +1,22 @@
+<template name="navbar">
+  <nav>
+    <ul>
+      <li>
+        <a href="/" class="{{isActiveRoute 'landing'}}">
+          <i class="icon-home"></i>
+          <span>Welcome</span>
+        </a>
+        <a href="/new" class="{{isActiveRoute 'new'}}">
+          <i class="icon-paper-plane"></i>
+          <span>Sell</span>
+        </a>
+        {{#if category}}
+          <a href="/category/{{category}}" class="{{isActiveRoute 'category'}}">
+            <i class="icon-list"></i>
+            <span>{{category}}</span>
+          </a>
+        {{/if}}
+      </li>
+    </ul>
+  </nav>
+</template>

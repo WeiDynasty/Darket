@@ -1,0 +1,16 @@
+<template name="landing">
+  <h1>Welcome to the Distributed Marketplace</h1>
+  <p>To get started enter a category below, or <a href='/new' class='dapp-block-button dapp-small'>create a new market</a></p>
+  <form class='set-category'>
+    <input name='category'>
+    <button type='submit' class='dapp-block-button dapp-small'>Go to category</button>
+  </form>
+  <h4>Popular categories:</h4>
+  <p>
+    {{#each popularCategories}}
+      <button class='dapp-tag-button popular-category' name='{{.}}'>{{.}}</button>
+    {{else}}
+      <p>No popular categories</p>
+    {{/each}}
+  </p>
+</template>

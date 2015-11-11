@@ -1,0 +1,8 @@
+<template name="market">
+  {{#if market}}
+    <h1>{{market.title}}</h1>
+    {{#markdown}}{{market.description}}{{/markdown}}
+  {{else}}
+    <p>Couldn't find the market..</p>
+  {{/if}}
+</template>
