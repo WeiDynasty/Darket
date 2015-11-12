@@ -28,3 +28,6 @@ kadira:flow-router
 kadira:blaze-layout
 pcel:serialize
 zimme:active-route
+
+# dev tools
+msavin:mongol

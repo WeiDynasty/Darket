@@ -1,8 +1,31 @@
 <template name="market">
   {{#if market}}
-    <h1>{{market.title}}</h1>
-    {{#markdown}}{{market.description}}{{/markdown}}
+    <div class="row market-item">
+      <div class="col col-8">
+        <h1>{{market.title}}</h1>
+        <h2>{{market.category}}</h2>
+        {{#if market.image}}
+          <p>
+            <img class='market-image' src="{{market.image}}" alt="{{market.title}}">
+          </p>
+        {{/if}}
+        {{#markdown}}{{market.description}}{{/markdown}}
+      </div>
+      <div class="col col-4">
+        <h3>Price: <b>{{dapp_formatBalance "1000000133" "0,0.00[0000]" "ether"}} - ({{dapp_formatBalance market.price "0,0.0[00] unit" "usd"}})</b></h3>
+        <h3>Stock: <b>{{market.stock}}</b></h3>
+        {{> dapp_selectAccount accounts=myAccounts showAccountTypes=true}}
+        <br>
+        {{> buyButton}}
+
+      </div>
+    </div>
   {{else}}
     <p>Couldn't find the market..</p>
   {{/if}}
+</template>
+
+<template name="buyButton">
+  <!-- todo - replace with the escrow button -->
+  <button class='dapp-block-button'>Buy it!</button>
 </template>

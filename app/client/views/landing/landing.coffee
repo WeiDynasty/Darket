@@ -1,5 +1,6 @@
 Template.landing.helpers
-  popularCategories: ['art', 'books', 'cars', 'developers', 'energy drinks']
+  popularCategories: ->
+    _.uniq _.pluck Cols.Markets.find().fetch(), 'category'
 
 Template.landing.events
   'submit .set-category' : (e) ->
