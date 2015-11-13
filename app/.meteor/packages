@@ -20,9 +20,12 @@ less
 showdown
 
 ethereum:web3
+ethereum:accounts
 ethereum:tools
 ethereum:elements
 ethereum:dapp-styles
+
+sunnyg:meteor-ipfs
 
 kadira:flow-router
 kadira:blaze-layout

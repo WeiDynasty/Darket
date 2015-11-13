@@ -10,10 +10,10 @@
     <br>
     <input type="number" placeholder="Price in Wei - e.g. 9001" name="price">
     <br>
-    <input type="number" placeholder="Stock Available - e.g. 1" name="stock">
-    <br>
     <input type="text" placeholder="Image - e.g. https://ipfs.pics/ipfs/Q..." name="image">
     <br><br>
+    {{> dapp_selectAccount accounts=myAccounts showAccountTypes=true}}
+    <br>
     <button class='dapp-block-button'>Submit new market</button>
   </form>
 </template>
