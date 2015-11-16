@@ -42,7 +42,8 @@ Instructions: Clone the build, run a local server in the root dir, start geth + 
 * Contrib Guidelines
 * Packageize
 * Maybe switch from `dapp-styles` to bootstrap/materialize
-* Setup testnet 
+* [ ]Setup testnet 
+* [ ] Package a build that can run in a static directory to eliminate local server
 
 ---
 
