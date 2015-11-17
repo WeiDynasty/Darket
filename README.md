@@ -44,7 +44,9 @@ Instructions: Clone the build, run a local server in the root dir, start geth + 
 * Maybe switch from `dapp-styles` to bootstrap/materialize
 * Setup testnet 
 * Package a build that can run in a static directory to eliminate local server
-* Research/Test timeout system in contract
+* Research/Test dispute system
+  * Voting contract
+  * Reputation contract
 * Improve syncing data
   * Add check to contract that ensures old data exists in new object
   * Service Discovery  [Discussion] (https://github.com/ipfs/notes/issues/15)
