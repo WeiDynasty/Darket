@@ -4,9 +4,17 @@
 
 This project is a work in progress.
 
+<h5> Dapp Structure </h5>
+
+	-Interface: JS + HTML% + CSS3
+	-Storage (client): minimongo, indexeddb, webSQL
+	-Hosting: IPFS 
+
 IPFS BUILD: QmYKnuxh82bjdsunbovZ6aDRG1CiEGkPtaBQE5VetAXebb
 
-Instructions: Clone the build, run a local server in the root dir, start geth + IPFS
+<h5>Instructions:</h5> 
+
+Clone the build, run a local server in the root dir, start geth + IPFS
 
 ## Things that need to be done
 
