@@ -7,7 +7,7 @@ This project is a work in progress.
 <h5> Dapp Structure </h5>
 
 	-Interface: JS + HTML% + CSS3
-	-Storage (client): minimongo, indexeddb, webSQL
+	-Storage (client): minimongo
 	-Hosting: IPFS 
 
 IPFS BUILD: QmYKnuxh82bjdsunbovZ6aDRG1CiEGkPtaBQE5VetAXebb
