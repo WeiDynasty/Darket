@@ -5,7 +5,7 @@ contract MoonMarket {
 
     
     function MoonMarket() {
-    	owner = msg.sender;
+        owner = msg.sender;
     }
 
     function addMarket(bytes32 name, address addr) returns (bool result) {
@@ -43,7 +43,7 @@ contract Market {
     State public state;
 
     function Market() {
-    	admin = msg.sender;
+        admin = msg.sender;
     }
 
     function setMarketAddress(address marketAddr) returns (bool result){
