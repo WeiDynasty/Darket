@@ -2,7 +2,6 @@ contract MoonMarket {
     
     address public owner;
     mapping (bytes32 => address) public markets;
-    mapping (address => address[])[] data;
 
     
     function MoonMarket() {
@@ -19,12 +18,18 @@ contract MoonMarket {
         return true;
     }
 
-    function deleteMarket(address dmAddr){
-        //todo delete function 
+    function deleteMarket(bytes32 name) returns (bool result){
+        if(markets[name] == 0x0){
+            return false;
+        }
+        if(msg.sender != owner) throw;
+        markets[name] = 0x0;
+        return true;
     }
     
     function remove() {
         if (msg.sender == owner){
+            //don't suicide, put in state that error handles
             suicide(owner);
         }
     }
@@ -34,13 +39,15 @@ contract MoonMarket {
 contract Market {
 
     address public admin;
-
+    enum State {Created, Destroyed}
+    State public state;
 
     function Market() {
     	admin = msg.sender;
     }
 
     function setMarketAddress(address marketAddr) returns (bool result){
+        if(state == State.Destroyed) throw;
         if(admin != 0x0 && marketAddr != admin){
             return false;
         }
@@ -50,7 +57,9 @@ contract Market {
 
     function remove() {
         if (msg.sender == admin){
-            suicide(admin);
+            //suicide(admin);
+            //suicide does not free up blockchain space and can trap txs
+            state = State.Destroyed;
         }
     }
 }
