@@ -8,14 +8,16 @@ contract MoonMarket {
         owner = msg.sender;
     }
 
-    function addMarket(bytes32 name, address addr) returns (bool result) {
-        Market mar = Market(addr);
+    function replaceOwner(address _owner){
+        if(msg.sender != owner) throw;
+        owner = _owner;
+    }
 
-        if(!mar.setMarketAddress(address(this))) {
-            return false;
-        }
-        markets[name] = addr;
-        return true;
+    function addMarket(bytes32 name) returns (address marAddr) {
+        //no check on msg.sender, anyone can open a market
+        address temp = new Market();
+        markets[name] = temp;
+        return temp;
     }
 
     function deleteMarket(bytes32 name) returns (bool result){
@@ -24,7 +26,12 @@ contract MoonMarket {
         }
         if(msg.sender != owner) throw;
         markets[name] = 0x0;
+        suicide(markets[name]);
         return true;
+    }
+
+    function getMarket(bytes32 name) constant returns (address addr){
+        return markets[name];
     }
     
     function remove() {
@@ -39,11 +46,20 @@ contract MoonMarket {
 contract Market {
 
     address public admin;
+    //use different datatype to store ipfs hash
+    string public dataHash1;
+    string public dataHash2;
     enum State {Created, Destroyed}
     State public state;
 
     function Market() {
         admin = msg.sender;
+    }
+
+    function setHash(string firstPart, string secondPart) {
+        if(state != State.Finalized) throw;
+        dataHash1 = firstPart;
+        dataHash2 = secondPart;   
     }
 
     function setMarketAddress(address marketAddr) returns (bool result){
