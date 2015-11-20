@@ -62,3 +62,11 @@ moonmarketInstance = moonmarketContract.at('0x9e4f0b2653dd27e012547f0a4d195f5715
 Contract mined! address: 0xdec8d276f032480341be713ac75c4ced9e05e7de transactionHash: 0x3f247da1a89836fc60a07cbfc95ecef576209fd3dc99fbbf4eaf18cd2d7f52b4
 
 marketInstance = marketContract.at('0xdec8d276f032480341be713ac75c4ced9e05e7de')
+
+//killed
+market created at addy 0x0b8616a33eb7b62d6a13b59d78d1a57be9e88c96
+marketInstance = marketContract.at('0x0b8616a33eb7b62d6a13b59d78d1a57be9e88c96')
+marketInstance.setHash('test', 'test2', {from: web3.eth.accounts[0], gas: 70000})
+
+moonmarketInstance.getMarket('first market')
+"0x9c810a00e48dcf5f764a9059dcf46592fb73a53f"
