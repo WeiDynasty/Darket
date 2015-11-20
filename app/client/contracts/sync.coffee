@@ -1,5 +1,7 @@
 @Contracts = @Contracts || {}
 
+//syncing contract is now each market contract that stores the IPFS data hash for that market
+
 getIPFSData = ->
   ipfsHash = Contracts.Sync.getHash1() + Contracts.Sync.getHash2()
   ipfs.cat ipfsHash, (err,res) ->
