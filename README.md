@@ -14,6 +14,11 @@ IPFS BUILD: QmYKnuxh82bjdsunbovZ6aDRG1CiEGkPtaBQE5VetAXebb
 
 <h5>Instructions:</h5> 
 
+<b>Testnet</b>
+
+<code> geth --rpc --networkid=39318 --maxpeers=0 --datadir=~/.ethereum/DevChain/ --mine --minerthreads 2 --genesis /home/nathan/gen.json --etherbase 'fdff6d471a57e0fc4175a1ecd478372f8e6698ef' --unlock fdff6d471a57e0fc4175a1ecd478372f8e6698ef console
+</code>  
+
 Genesis file
 <code>
 {
