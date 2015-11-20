@@ -39,6 +39,10 @@ contract MoonMarket {
         if(state == State.Destroyed) throw;
         return markets[name];
     }
+
+    function getAllMarkets() constant returns (address[]){
+        //TODO create this function and test
+    }
     
     function remove() {
         if (msg.sender == owner){
