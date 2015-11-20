@@ -64,7 +64,7 @@ contract Market {
 
     function setMarketOwner(address ownAddr) returns (bool result){
         if(state == State.Destroyed) throw;
-        if(admin != 0x0 && ownAddr != admin){
+        if(admin != 0x0 && ownAddr == admin){
             return false;
         }
         admin = ownAddr;
