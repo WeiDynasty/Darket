@@ -57,17 +57,17 @@ contract Market {
     }
 
     function setHash(string firstPart, string secondPart) {
-        if(state != State.Finalized) throw;
+        if(state == State.Destroyed) throw;
         dataHash1 = firstPart;
         dataHash2 = secondPart;   
     }
 
-    function setMarketAddress(address marketAddr) returns (bool result){
+    function setMarketOwner(address ownAddr) returns (bool result){
         if(state == State.Destroyed) throw;
-        if(admin != 0x0 && marketAddr != admin){
+        if(admin != 0x0 && ownAddr != admin){
             return false;
         }
-        admin = marketAddr;
+        admin = ownAddr;
         return true;
     }
 
