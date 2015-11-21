@@ -55,6 +55,7 @@ Clone the build, run a local server in the root dir, start geth + IPFS
 * [x] Setup testnet
 * Package a build that can run in a static directory to eliminate local server
 * Research/Test dispute system
+  * <a href="https://github.com/pipermerriam/ethereum-alarm-clock">Alarm Clock for scheduling a kill timer to disputes</a>
   * Voting contract
   * Reputation contract
 * Improve syncing data
