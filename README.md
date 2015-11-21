@@ -35,8 +35,11 @@ Clone the build, run a local server in the root dir, start geth + IPFS
 * Better escrow contract
   * Needs to be able to handle multiple sales of the same product
   * Encrypted data to handle delivery address (? might not be needed if we have whisper)
-  * Needs to be able to handle edge cases such as either party dying (dead mans switch / fair timeout)
+  * Needs to be able to handle edge cases such as either party dying (dead mans switch / <a href="https://github.com/pipermerriam/ethereum-alarm-clock">fair timeout</a>)
+    * Research/Test dispute system
   * Instead of a deposit, can we use some kind of insurance contract/DAO?
+    * Voting contract
+    * Reputation contract  
 * Modular sales contracts (?)
   * Auctions
   * Sealed auctions
@@ -55,10 +58,6 @@ Clone the build, run a local server in the root dir, start geth + IPFS
 * Maybe switch from `dapp-styles` to bootstrap/materialize
 * [x] Setup testnet
 * Package a build that can run in a static directory to eliminate local server
-* Research/Test dispute system
-  * <a href="https://github.com/pipermerriam/ethereum-alarm-clock">Alarm Clock for scheduling a kill timer to disputes</a>
-  * Voting contract
-  * Reputation contract
 * Improve syncing data
   * Add check to contract that ensures old data exists in new object
   * Service Discovery  [Discussion] (https://github.com/ipfs/notes/issues/15)
