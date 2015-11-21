@@ -34,7 +34,7 @@ Clone the build, run a local server in the root dir, start geth + IPFS
     * Create DB on IPFS object for application to index
   * Wait for dapp store to open source -- it has most of the the answers
   * [x] Write name reg for market contracts in Control contract
-* Better escrow contract
+* Better escrow contract - [Discussion](https://github.com/WeiDynasty/Market-Dapp/issues/2)
   * Needs to be able to handle multiple sales of the same product
   * Encrypted data to handle delivery address (? might not be needed if we have whisper)
   * Needs to be able to handle edge cases such as either party dying (dead mans switch / <a href="https://github.com/pipermerriam/ethereum-alarm-clock">fair timeout</a>)
