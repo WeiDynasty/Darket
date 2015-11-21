@@ -63,7 +63,7 @@ Clone the build, run a local server in the root dir, start geth + IPFS
   * Service Discovery  [Discussion] (https://github.com/ipfs/notes/issues/15)
 * Browser implementation roadmap [Discussion] (https://github.com/ipfs/js-ipfs)
 * Write checks for Eth and IPFS Daemons on app load, display error screen
-* Write name reg DOUG for giving name to ethereum addresses as a simple login system
+* [x] Write name reg for market contracts in Control contract
 
 ---
 
