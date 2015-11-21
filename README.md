@@ -29,7 +29,9 @@ Clone the build, run a local server in the root dir, start geth + IPFS
 * Proper registry system
   * Anyone should be able to create their own market with arbitrary rules with regards to categories and products submissions. We need to describe a standard API for allowing a contract to determine what can or cannot be registered on a market.
   * Should be as lean as possible; use IPFS as much as possible
-  * An efficient way to search within a market
+  * An efficient way to search within a market 
+    * maybe use whisper to broadcast and filter products
+    * Create DB on IPFS object for application to index
   * Wait for dapp store to open source -- it has most of the the answers
   * [x] Write name reg for market contracts in Control contract
 * Better escrow contract
