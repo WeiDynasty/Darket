@@ -6,9 +6,9 @@ This project is a work in progress.
 
 <h5> Dapp Structure </h5>
 
-	-Interface: JS + HTML% + CSS3
+	-Interface: JS + HTML5 + CSS3
 	-Storage (client): minimongo
-	-Hosting: IPFS 
+	-Hosting: IPFS + Ethereum 
 
 IPFS BUILD: QmYKnuxh82bjdsunbovZ6aDRG1CiEGkPtaBQE5VetAXebb
 
