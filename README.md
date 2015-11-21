@@ -31,6 +31,7 @@ Clone the build, run a local server in the root dir, start geth + IPFS
   * Should be as lean as possible; use IPFS as much as possible
   * An efficient way to search within a market
   * Wait for dapp store to open source -- it has most of the the answers
+  * [x] Write name reg for market contracts in Control contract
 * Better escrow contract
   * Needs to be able to handle multiple sales of the same product
   * Encrypted data to handle delivery address (? might not be needed if we have whisper)
@@ -63,7 +64,6 @@ Clone the build, run a local server in the root dir, start geth + IPFS
   * Service Discovery  [Discussion] (https://github.com/ipfs/notes/issues/15)
 * Browser implementation roadmap [Discussion] (https://github.com/ipfs/js-ipfs)
 * Write checks for Eth and IPFS Daemons on app load, display error screen
-* [x] Write name reg for market contracts in Control contract
 
 ---
 
