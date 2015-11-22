@@ -18,7 +18,8 @@ contract MoonMarket {
     function addMarket(bytes32 name) returns (address marAddr) {
         if(state == State.Destroyed) throw;
         //no check on msg.sender, anyone can open a market
-        address temp = new Market();
+        //construct with msg.sender gives permission admin to the person creating the market
+        address temp = new Market(msg.sender);
         markets[name] = temp;
         return temp;
     }
@@ -57,14 +58,17 @@ contract MoonMarket {
 contract Market {
 
     address public admin;
+    mapping (bytes32 => address) public products;
     //use different datatype to store ipfs hash
     string public dataHash1;
     string public dataHash2;
     enum State {Created, Destroyed}
     State public state;
 
-    function Market() {
-        admin = msg.sender;
+    function Market(address init) {
+        //gives permission to the calling contract
+        //admin = msg.sender;
+        admin = init;
     }
 
     function setHash(string firstPart, string secondPart) {
@@ -80,6 +84,15 @@ contract Market {
         }
         admin = ownAddr;
         return true;
+    }
+    
+    function addProduct(bytes32 name) returns (address prodAddr) {
+        if(state == State.Destroyed) throw;
+        //perm to post given to admin
+        if(msg.sender != admin) throw;
+        address prodTemp = new Product();
+        products[name] = prodTemp;
+        return prodTemp;
     }
 
     function remove() {
