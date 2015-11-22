@@ -103,3 +103,16 @@ contract Market {
         }
     }
 }
+
+contract Product {
+	address public owner;
+	uint public itemNum;
+	enum State {Created, Destroyed}
+	State public state;
+	
+	function Product(){
+		//owned by the market contract 
+		owner = msg.sender;
+	}
+	
+}
