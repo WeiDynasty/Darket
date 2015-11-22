@@ -86,11 +86,11 @@ contract Market {
         return true;
     }
     
-    function addProduct(bytes32 name) returns (address prodAddr) {
+    function addProduct(bytes32 name, uint itemNumber) returns (address prodAddr) {
         if(state == State.Destroyed) throw;
         //perm to post given to admin
         if(msg.sender != admin) throw;
-        address prodTemp = new Product();
+        address prodTemp = new Product(itemNumber);
         products[name] = prodTemp;
         return prodTemp;
     }
@@ -106,13 +106,24 @@ contract Market {
 
 contract Product {
 	address public owner;
+	//EternalDB, replace with array??
+	mapping (uint => address) public escrows;
 	uint public itemNum;
 	enum State {Created, Destroyed}
 	State public state;
 	
-	function Product(){
+	function Product(uint itNum){
 		//owned by the market contract 
 		owner = msg.sender;
+		itemNum = itNum;
+		for(uint i = 0; i < itNum; i++){
+			//check the funding of spinning up these escrows
+			address escTemp = new Escrow();
+			escrows[i] = escTemp;
+		}
 	}
-	
+}
+
+contract Escrow{
+    
 }
