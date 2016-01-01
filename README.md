@@ -4,8 +4,46 @@
 
 ### The Distributed Marketplace
 
-This project is a work in progress.
+This is the react version of the Meteor Market-Dapp. 
 
+This version of the market can be hashed and added to IPFS for distribution (with a geth and IPFS node running). When a distribution is published with a hash you will be able to use this by visiting.
+
+```
+localhost:8080/ipfs/<hash>
+```
+
+Otherwise if you would like to hack this
+
+# Instructions on running your own applcation
+This application requires no server and can be distributed over IPFS. Currently you will need to install and run both an IPFS node and a Geth client as well as gulp to build your own dist file if you would like to edit the application. 
+
+### Install IPFS
+
+Install instructions can be found <a href="www.ipfs.io/install">here</a>
+
+### Install Geth
+
+Install instructions for geth can be found <a href="https://github.com/ethereum/go-ethereum/wiki/geth">here</a>
+
+### Clone the Repo
+
+```
+git clone <repo url>
+``` 
+
+### Install the packages
+```
+sudo npm install i
+```
+
+### Hash the contents with IPFS and view on a gateway
+
+```
+cd Market-Dapp
+ipfs add . -r
+```
+
+Enjoy!
 ---
 
 MIT 2015, Public Domain Attribution
