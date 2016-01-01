@@ -1,0 +1,25 @@
+{
+  "name": "market",
+  "version": "0.0.1",
+  "description": "Let's build something cool",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "gulp-install": "^0.6.0",
+    "jquery": "~2.1.4",
+    "react": "~0.14.1",
+    "reactify": "^1.1.1",
+    "babel": "^6.0.15",
+    "babelify": "^6.4.0",
+    "browserify": "^11.2.0",
+    "gulp": "^3.9.0",
+    "gulp-less": "^3.0.3",
+    "gulp-livereload": "^3.8.1",
+    "gulp-load-plugins": "^1.0.0",
+    "gulp-plumber": "^1.0.1",
+    "gulp-util": "^3.0.7",
+    "reactify": "^1.1.1",
+    "watchify": "^3.4.0"
+  }
+}
