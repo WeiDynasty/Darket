@@ -36,10 +36,15 @@ git clone <repo url>
 sudo npm install i
 ```
 
+### Build the dist file
+```
+cd Market-Dapp
+gulp
+```
+
 ### Hash the contents with IPFS and view on a gateway
 
 ```
-cd Market-Dapp
 ipfs add . -r
 ```
 
