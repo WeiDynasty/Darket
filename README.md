@@ -28,7 +28,7 @@ Install instructions for geth can be found <a href="https://github.com/ethereum/
 ### Clone the Repo
 
 ```
-git clone <repo url>
+git clone https://github.com/WeiDynasty/Market-Dapp.git
 ``` 
 
 ### Install the packages
