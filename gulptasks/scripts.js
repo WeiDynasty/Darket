@@ -11,9 +11,9 @@ var watchify = require('watchify');
 var notifier = require('node-notifier');
 //var webpack = require("webpack");
 
-gulp.task('marketDapp', function(){
+gulp.task('market', function(){
 	var bundler = watchify(browserify({
-		entries: ['components/marketDapp.jsx',],
+		entries: ['components/market.jsx',],
 		extensions: ['.jsx'],
 		debug: true,
 		transform:['babelify'],

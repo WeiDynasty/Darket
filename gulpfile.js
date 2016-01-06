@@ -9,6 +9,6 @@ requireDir('gulptasks');
 
 gulp.task('watch', function(){
 	livereload.listen()
-	gulp.watch('components/*.jsx', ['marketDapp']);
+	gulp.watch('components/*.jsx', ['market']);
 });
-gulp.task('default', ['marketDapp']);
+gulp.task('default', ['market']);
