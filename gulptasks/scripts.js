@@ -13,8 +13,8 @@ var notifier = require('node-notifier');
 
 gulp.task('market', function(){
 	var bundler = watchify(browserify({
-		entries: ['components/market.jsx',],
-		extensions: ['.jsx'],
+		entries: ['components/market.js',],
+		extensions: ['.jsx','.js'],
 		debug: true,
 		transform:['babelify'],
 		cache:{},

@@ -437,7 +437,7 @@ MarketAPI.prototype.getUserCommentList = function(parent,user,done){
 MarketAPI.prototype.checkForEthereum = function(){
   try{
     this.web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545')); 
-  }catch{
+  }catch(err){
     console.log('Could not find connected geth client, please check that it is running')
   }
 }
@@ -447,7 +447,7 @@ MarketAPI.prototype.checkForEthereum = function(){
 // Initialize API
 MarketAPI.prototype.init = function(done){
   if(this.isInit) return
-  checkForEthereum()   
+  this.checkForEthereum()   
   this.ipfs.id( (err, res) => {
     if(err){
       console.log('Error while getting OWN ID:',err)

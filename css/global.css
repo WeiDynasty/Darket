@@ -1,0 +1,35 @@
+.container-fluid {
+  padding-right: 0px;
+  padding-left: 50px;
+}
+.container-fluid .content {
+  height: 500px;
+  padding: 0;
+  background-color: green;
+}
+.navbar-default {
+
+}
+
+.nav-tabs > .active > a, .nav-tabs > .active > a:hover { 
+	outline: 0;
+	border: 0;
+}
+
+.navRight {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: right;
+}
+.logostyle = {
+	      width: '170px',
+	      marginTop: '-100px',
+	      marginLeft: '-100px'
+	    }
+.headerstyle = {
+	      marginLeft: '-70px'
+	    }
+#rightStyle = {
+	    	marginRight: '100px'
+	    }
