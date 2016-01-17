@@ -4,7 +4,7 @@ const AccountContainer = React.createClass({
 		<div>
 			test 3
 		</div>
-		);
+		)
 	}
-});
-module.exports = AccountContainer;
+})
+module.exports = AccountContainer

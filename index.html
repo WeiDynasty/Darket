@@ -1,11 +1,14 @@
 <!-- index.html -->
 <!DOCTYPE html>
-<html>
+<html class="no-js" lang="en">
   <head>
     <meta charset="utf-8" />
     <title>Market Dapp</title>
     <link rel="stylesheet" href="css/bootstrap.css"></link>
     <link rel="stylesheet" href="css/global.css"></link>
+    <script src="js/libraries/sweetalert/sweetalert.min.js"></script> 
+    <link rel="stylesheet" type="text/css" href="js/libraries/sweetalert/sweetalert.css">
+    <link rel="stylesheet" href="css/template.css">
     <!-- <script type="text/javascript" src="js/libraries/jquery/jquery-2.1.4.js"></script> -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.4/react-with-addons.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/react/0.14.4/react-dom.js"></script>
@@ -15,9 +18,14 @@
         var Web3 = require('web3');
         var web3 = new Web3();
     </script>
+    <script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
+    <script src="http://dhbhdrzi4tiry.cloudfront.net/cdn/sites/foundation.js"></script>
   </head>
   <body>
     <div id="content"></div>
     <script src="dist/bundle.js"></script>
+    <script>
+      $(document).foundation();
+</script>
   </body>
 </html>

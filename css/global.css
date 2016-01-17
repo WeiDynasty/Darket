@@ -30,6 +30,10 @@
 .headerstyle = {
 	      marginLeft: '-70px'
 	    }
+.col-centered{
+    float: none;
+    margin: 0 auto;
+}
 #rightStyle = {
 	    	marginRight: '100px'
 	    }

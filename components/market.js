@@ -39,9 +39,10 @@ var App = React.createClass ({
     },	
   	render: function() {
 	  	var logostyle = {
-	      width: '160px',
-	      marginTop: '-93px',
-	      marginLeft: '-100px'
+	      height: '50px',
+	      marginLeft: '-30px',
+	      marginRight: '80px',
+	      marginTop: '3px'
 	    }
 	    var headerstyle = {
 	      marginLeft: '-70px'
@@ -58,14 +59,14 @@ var App = React.createClass ({
 		  <div>
 			<nav className="navbar navbar-default">
 			  <div className="container-fluid">
-			  	<div className="navbar-header">
-			       <a className="navbar-brand" href="#"><img src="images/IPFS_SwarmLogo_Draft111915.svg" style={logostyle} ></img></a>
+			  	<div className="nav navbar-nav">
+			       <Link to="/"><img src="images/IPFS_SwarmLogo_Draft111915.svg" style={logostyle} ></img></Link>
 			    </div>
 			    <div style={headerstyle} className="navbar-header">
-			      <a className="navbar-brand" href="#">IPFS Market</a>
+			      <Link to="/" className="navbar-brand">IPFS Market</Link>
 			    </div>
 			    <ul className="nav navbar-nav">
-			      <li><Link to="/home">Home</Link></li>
+			      <li><Link to="/">Home</Link></li>
 			      <li><Link to="/markets">Markets</Link></li> 
 			      <li><a href="https://github.com/WeiDynasty/Market-Dapp">Github</a></li>
 			    </ul>
@@ -83,7 +84,7 @@ var App = React.createClass ({
 render((
   <Router history={browserHistory}>
     <Route path="/" component={App}>
-      <Route path="/home" component={HomeComponent}/>
+      <IndexRoute component={HomeComponent}/>
       <Route path="/markets" component={BodyContainer}/>
       <Route path="/account" component={AccountContainer}/>
     </Route>
