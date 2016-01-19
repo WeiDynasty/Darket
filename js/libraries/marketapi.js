@@ -69,50 +69,32 @@ function MarketAPI(ipfs, web3){
     }
   }
 }
-
-MarketAPI.prototype.backupCache = function(){
-  if(localStorage !== undefined){
-    // Use localStorage to store the IPNS cache
-    localStorage.setItem('market-user-cache',JSON.stringify(this.users))
-  }
-}
-
 // Rewrote this to use event emitters. Should also add periodic rechecking
 MarketAPI.prototype.resolveIPNS = function(n,handler){
-  if(handler && handler.apply) this.ee.on(n,handler)
-  var cached = this.users[n]
-  if(cached){
-    //this.ee.emit(n,cached)
-    console.log(n,'was cached',cached)
-  } else {
-    console.log(n,'not cached')
-  }
   if(this.resolving_ipns[n] != true){
     this.resolving_ipns[n] = true
     this.ipfs.name.resolve(n,(err,r) => {
       if(err){
-        // Communicate error
-        console.log(err)
-        //this.ee.emit('error',err)
+        swal({   
+            title: "Error!",   
+            text: 'Could not resolve IPNS Data',   
+            type: "error",   
+            confirmButtonText: "Close" 
+          });
       } else {
-        console.log(r)
+        console.log('IPNS Data Hash Path: ' + r.Path)
         this.idhash = r.Path
         var url = r.Path
         if(url === undefined){
           console.log('Could not resolve',n)
-          this.ee.emit('error',r.Message)
         } else this.isUserProfile(url,(isit,err) => {
           //this was getting pulled from temp storage
           //else if(this.users[n] != url) this.isUserProfile(url,(isit,err) => {
           if(isit){
-            console.log(n,'has an account')
-            if(this.users[n] === undefined) this.ee.emit('user',n,url)
-            this.users[n] = url
-            this.ee.emit(n,url)
-            this.backupCache()
+            this.ee.emit('initdone',undefined)
+            this.ee.removeEvent('initdone')
           } else {
-            console.log(n,'not a valid profile, please use the sign-up to create your account:',err)
-            this.ee.emit(n,undefined,'not a valid profile, please use the sign-up to create your account: '+err)
+            console.log('failed to sign in')
           }
           this.resolving_ipns[n] = false
           return true // Remove from listeners
@@ -125,11 +107,25 @@ MarketAPI.prototype.resolveIPNS = function(n,handler){
 
 MarketAPI.prototype.isUserProfile = function(addr,done){
   if(addr === undefined) return console.log('Asked to check if undefined is a profile')
-  this.ipfs.cat(addr+this.baseurl+'user.json',(err,r) => {
-    if(err) return done(false,err)
-      this.schemaObject = JSON.parse(r)
-      done(true)
-      this.ee.emit('init',undefined)
+  this.ipfs.cat(addr+this.baseurl+'user.txt',(err,r) => {
+    if(err){
+      swal({   
+              title: "Error!",   
+              text: 'You do not have an account yet, please create one',   
+              type: "error",   
+              confirmButtonText: "Close" 
+      });
+      done(false)
+    }
+      if(r == this.version){
+        console.log(this.checkForEthereum())
+        if(this.checkForEthereum()){
+        console.log('Account Found With Mathcing Version: ' + r)
+        done(true)
+      }else{
+        done(false)
+      }
+    }
   })
 }
 
@@ -435,10 +431,17 @@ MarketAPI.prototype.getUserCommentList = function(parent,user,done){
 }
 
 MarketAPI.prototype.checkForEthereum = function(){
-  try{
-    this.web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545')); 
-  }catch(err){
-    console.log('Could not find connected geth client, please check that it is running')
+  var self = this
+  if(!web3.isConnected()) {
+    swal({   
+            title: "Error!",   
+            text: 'Geth account is not connected.',   
+            type: "error",   
+            confirmButtonText: "Close" 
+          });
+    return false
+  } else {
+    return true
   }
 }
 
@@ -447,45 +450,22 @@ MarketAPI.prototype.checkForEthereum = function(){
 // Initialize API
 MarketAPI.prototype.init = function(done){
   if(this.isInit) return
-  this.checkForEthereum()   
+  this.web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'))   
   this.ipfs.id( (err, res) => {
     if(err){
+      swal({   
+            title: "Error!",   
+            text: 'IPFS Client Not Found',   
+            type: "error",   
+            confirmButtonText: "Close" 
+      });
       console.log('Error while getting OWN ID:',err)
-      this.ee.emit('error',err)
-      this.ee.emit('init',err)
-      if(done && done.apply) done(err)
     } else if(res.ID){
-      console.log('I am',res.ID)
+      console.log('IPFS ID: ',res.ID)
       this.id = res.ID
       //this can probably be replaced with 'ipfs files stat /' for all local queries to own database 
       this.resolveIPNS(res.ID)
       console.log('Market version is',this.version)
-      this.ipfs.add(new Buffer('market:version:'+this.version),{n: true},(err2,r) => {
-        if(err2){
-          this.ee.emit('error',err2)
-          console.log('Error while calculating version hash:',err2)
-          this.ee.emit('init',err2)
-          if(done && done.apply) done(err2)
-        } else {
-          if(r && r.Hash) this.version_hash = r.Hash
-          if(r && r[0] && r[0].Hash) this.version_hash = r[0].Hash
-          //console.log('Market version hash is',this.version_hash)
-          this.ipfs.version((err,res) => {
-            if(err){
-              this.ee.emit('error',err)
-              this.ee.emit('init',err)
-              console.log('Error while getting ipfs version:',err)
-              if(done && done.apply) done(err)
-            } else {
-              this.ipfs_version = res.Version
-              console.log('IPFS Version is',res.Version)
-              //this.ee.emit('init',undefined)
-              this.isInit = true
-              if(done && done.apply) done(null)
-            }
-          })
-        }
-      })
     }
   })
 }

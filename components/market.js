@@ -4,39 +4,24 @@ import { Router, Route, IndexRoute, Link, IndexLink, browserHistory } from 'reac
 import HomeComponent from'./homecontainer'
 import BodyContainer from './bodycontainer'
 import AccountContainer from './accountcontainer'
-import MarketAPI from '../js/libraries/marketapi-wrapper'
+import ProductContainer from './productcontainer'
+import MarketsContainer from './marketscontainer'
+
 
 var App = React.createClass ({
-		initialize: function(){	    
-	    var user = new MarketAPI();
-	    //example of using the netid api to get the eth balance
-	    var web3test = user.account.getBalance();
-	    console.log('Balance: '+web3test+' Ether')
-		var self = this 
-		self.setState({
-			api: user
-		})
-	    if(!this.isMounted()) return
-	    var ee = user.account.getEventEmitter()
-	    ee.on('init',err => {
-	      if(!err && this.isMounted()){
-	      	console.log('finished initializing api')
-	      	var schemObj = user.account.schemaObject
-	        self.setState({ 
-	        	showLoading: false,
-	        	personas: schemObj,
-	        	activePersona: schemObj[0]
-	        });
-	      }
-	      if(err){
-	      	console.log(err)
-	      }
-	    })	
+	getInitialState: function() {
+		return {
+			"loadingImg": 'images/user.png'
+		}
 	},
-    componentDidMount: function(){
-    	var self  = this;
-    	this.initialize();
-    },	
+	handleUserIcon: function(i){
+		this.setState({
+			"loadingImg": i
+		})
+	},
+	componentDidMount: function() {
+   	 	window.addEventListener('icon', this.handleUserIcon);
+  	},
   	render: function() {
 	  	var logostyle = {
 	      height: '50px',
@@ -71,8 +56,18 @@ var App = React.createClass ({
 			      <li><a href="https://github.com/WeiDynasty/Market-Dapp">Github</a></li>
 			    </ul>
 			    <ul className="navbar-brand navbar-right" style={rightStyle}>
-			    	<Link to="/account" className="navbar-right"><img src="images/user.png" style={userStyle}></img></Link>
+			    	<Link to="/account" className="navbar-right"><img src={this.state.loadingImg} style={userStyle}></img></Link>
 			    </ul>
+			    <ul className="navbar-brand navbar-right" style={rightStyle}>
+			    	<form className="navbar-form" role="search">
+					<div className="input-group">
+						<input type="text" className="form-control" placeholder="Coming Soon!" name="srch-term" id="srch-term"/>
+						<div className="input-group-btn">
+							<button className="btn btn-default" type="submit">Search</button>
+						</div>
+					</div>
+					</form>
+				</ul>
 			  </div>
 			</nav>
 			{this.props.children}
@@ -85,8 +80,11 @@ render((
   <Router history={browserHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={HomeComponent}/>
-      <Route path="/markets" component={BodyContainer}/>
+      <Route path="/market" component={BodyContainer}/>
       <Route path="/account" component={AccountContainer}/>
+      <Route path="/product" component ={ProductContainer}/>
+      <Route path="/markets" component ={MarketsContainer}/>
     </Route>
   </Router>
 ), document.getElementById('content'))
+

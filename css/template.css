@@ -1837,10 +1837,6 @@ screen and (min-width: 75em) {
     background: #ec5840;
     color: #fefefe
 }
-.badge.warning {
-    background: #ffae00;
-    color: #fefefe
-}
 .breadcrumbs {
     list-style: none;
     margin: 0 0 1rem
@@ -1917,15 +1913,6 @@ screen and (min-width: 75em) {
 }
 .callout.alert a:hover {
     color: #791b0c
-}
-.callout.warning {
-    background-color: #fff3d9
-}
-.callout.warning a {
-    color: #b37a00
-}
-.callout.warning a:hover {
-    color: #664600
 }
 .callout.small {
     padding: .5rem
@@ -2153,10 +2140,6 @@ screen and (min-width: 75em) {
 }
 .label.alert {
     background: #ec5840;
-    color: #fefefe
-}
-.label.warning {
-    background: #ffae00;
     color: #fefefe
 }
 .media-object {
@@ -2541,9 +2524,6 @@ html {
 }
 .progress.alert .progress-meter {
     background-color: #ec5840
-}
-.progress.warning .progress-meter {
-    background-color: #ffae00
 }
 .progress-meter {
     position: relative;

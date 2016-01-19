@@ -1,20 +1,23 @@
+import React from 'react'
+import { render } from 'react-dom'
+import { Router, Route, IndexRoute, Link, IndexLink, browserHistory } from 'react-router'
 const BodyContainer = React.createClass({
 	render: function() {
 		return (
 		<div>
 			<div className="row column text-center">
-				<h2>Our Newest Products</h2>
+				<h2>View once in a market</h2>
 				<hr/>
 			</div>
 			<div className="row small-up-2 large-up-4">
 				<div className="column">
-					<img className="thumbnail" src="http://placehold.it/300x400"/>
+					<img className="thumbnail" src="http:localhost:8080/ipfs/Qma3hV1MLwSMjey2ZyaHaRP4UaKE4m9Hbc4nR8gArD3Rs4"/>
 					<h5>Nulla At Nulla Justo, Eget</h5>
 					<p>$400</p>
-					<a href="#" className="btn btn-primary btn-lg btn-block">Buy</a>
+					<Link to="/product" className="btn btn-primary btn-lg btn-block">Buy</Link>
 				</div>
 				<div className="column">
-					<img className="thumbnail" src="http://placehold.it/300x400"/>
+					<img className="thumbnail" src="http://localhost:8080/ipfs/QmS5TY4HREHXFjYuY1xnfTfNNVUC3cFNnTx2jbLsH4aJkn"/>
 					<h5>Nulla At Nulla Justo, Eget</h5>
 					<p>$400</p>
 					<a href="#" className="btn btn-primary btn-lg btn-block">Buy</a>
@@ -176,7 +179,7 @@ const BodyContainer = React.createClass({
 			</div>
 			<div className="callout large secondary">
 				<div className="row">
-					<div className="large-4 columns">
+					<div className="large-12 columns">
 						<h5>Vivamus Hendrerit Arcu Sed Erat Molestie</h5>
 						<p>Curabitur vulputate, ligula lacinia scelerisque tempor, lacus lacus ornare ante, ac egestas est urna sit amet arcu. className aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Sed molestie augue sit.</p>
 					</div>
