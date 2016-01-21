@@ -3,6 +3,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, IndexRoute, Link, IndexLink, browserHistory } from 'react-router'
 import Modal from 'react-modal'
+import LoadingModalComponent from './loadingmodal'
 
 const customStyles = {
   content : {
@@ -16,25 +17,29 @@ const customStyles = {
 };
 
 const MarketsComponent = React.createClass({
-	 getInitialState: function() {
-	return { modalIsOpen: false };
+	getInitialState: function() {
+		return { 
+			modalIsOpen: false,
+			loading: true
+		};
 	},
 
 	openModal: function() {
-	this.setState({modalIsOpen: true});
+		this.setState({modalIsOpen: true})
 	},
 
 	closeModal: function() {
-	this.setState({modalIsOpen: false});
+		this.setState({modalIsOpen: false})
 	},
 	createMarket: function(){
 		console.log(this.refs.mname.value)
-		this.setState({modalIsOpen: false});
+		this.setState({modalIsOpen: false})
 	},
 	initialize: function(){	    
-	    var user = new MarketAPI();
+	    var user = new MarketAPI()
+	    user.account.init()
 	    //example of using the netid api to get the eth balance
-	    var web3test = user.account.getBalance();
+	    var web3test = user.account.getBalance()
 	    console.log('Balance: '+web3test+' Ether')
 		var self = this 
 		self.setState({
@@ -53,23 +58,39 @@ const MarketsComponent = React.createClass({
           	});
 	        self.setState({ 
 	        	"loadingImg": "test",
-	        	"user": user
+	        	"user": user,
+	        	loading: false
 	        });
-	        self.props.handleUserIcon('test')
+	        //self.props.handleUserIcon('test')
 	      }
 	      if(err){
 	      	console.log(err)
 	      }
 	    })	
 	},
+	getMarkets: function(){
+		var addr = '0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98'
+		var marAddr = addr
+	    var url = '/market/'+marAddr
+    	var rows = []
+    	var rand = Math.floor(Math.random()*100000000000000000)
+    	rows.push(<tr key={rand}>
+					    <td><Link to={url}>Voxelot's Spacelab</Link></td>
+					    <td>0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98</td>
+					    <td>This is THE place for all of your warp drive engine parts and repairs, probing equipment, and much more!</td>  
+					</tr>)
+		this.setState({
+			"displayRows":rows
+		})
+	},
 	componentDidMount: function(){    	
     	this.initialize()
+    	this.getMarkets()
     },
 	render: function() {
 		var tablestyle = {
 			width:'100%'
 	    }
-	    var rows = []
 		return (
 		<div>
 			<div className="row">
@@ -104,9 +125,9 @@ const MarketsComponent = React.createClass({
 			                    </select>
 			                </fieldset>
 			              	<fieldset className="form-group">
-			                  <label htmlFor="personaHobbies">Market Rules</label>
-			                  <p>Separated by commas</p>
-			                  <textarea ref="chobbies" name="hobbies" className="form-control" id="personaHobbies" ></textarea>
+			                  <label htmlFor="rules">Market Rules</label>
+			                  <p>Separated by commas, products containing these key words will be filtered out.</p>
+			                  <textarea ref="crules" name="hobbies" className="form-control" id="rules" ></textarea>
 			                </fieldset>         
 			                <fieldset className="form-group">
 			                 <label htmlFor="exampleInputFile">Upload an Image</label>
@@ -130,17 +151,13 @@ const MarketsComponent = React.createClass({
 					    <td>Market Address</td>
 					    <td>Description</td> 
 					  </tr>
-					  <tr>
-					    <td><Link to="market">Voxelot's Spacelab</Link></td>
-					    <td>0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98</td>
-					    <td>This is THE place for all of your warp drive engine parts and repairs, probing equipment, and much more!</td>  
-					  </tr>
-					  {rows}
+					  	{this.state.displayRows}
 					  </tbody>
 					</table>
     			</div>
     		</div>
 		</div>
+		<LoadingModalComponent loading={this.state.loading}/>
 		</div>
 		);
 	}

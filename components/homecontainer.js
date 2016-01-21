@@ -20,39 +20,56 @@ const customStyles = {
 const HomeComponent = React.createClass({
 	getInitialState: function() {
 	return { 
-		modalIsOpen: false,
-		loading: true
+		modalCreateIsOpen: false,
+		modalSignIsOpen: false,
+		loading: false
+		//user: this.props.user
 	 };
 	},
 
-	openModal: function() {
+	openCreateModal: function() {
 	//this.initialize()
 		this.setState({
-			loading: true,
-			modalIsOpen: true,
+			modalCreateIsOpen: true,
 			showLoading: false
 		});
 	},
-
-	closeModal: function() {
+	openSignModal: function() {
 		this.setState({
-			modalIsOpen: false
+			modalSignIsOpen: true,
+			showLoading: false
+		});
+	},
+	closeSignModal: function() {
+		this.setState({
+			modalSignIsOpen: false
+		});
+	},
+	closeCreateModal: function() {
+		this.setState({
+			modalCreateIsOpen: false
 		});
 	},
 	createAccount: function(){
+		this.setState({
+			modalCreateIsOpen: false,
+			loading: true
+		})
+		this.initialize()
 		console.log(this.refs.cname.value)
-		this.setState({modalIsOpen: false});
+		console.log('from createAccount() '+this.state.user)
 	},
-
-	initialize: function(){	    
-	    var user = new MarketAPI();
+	signIn: function(){
+		this.setState({modalSignIsOpen: false})
+	},
+	initialize: function(){    
+	    var user = new MarketAPI()
+	    user.account.init()
 	    //example of using the netid api to get the eth balance
-	    var web3test = user.account.getBalance();
+	    var web3test = user.account.getBalance()
 	    console.log('Balance: '+web3test+' Ether')
 		var self = this 
-		self.setState({
-			api: user
-		})
+		console.log('from init function: '+self.props.user)
 	    if(!this.isMounted()) return
 	    var ee = user.account.getEventEmitter()
 	    ee.on('initdone',err => {
@@ -65,12 +82,17 @@ const HomeComponent = React.createClass({
 	            confirmButtonText: "Close" 
           	});
 	        self.setState({ 
-	        	"loadingImg": "test",
-	        	"user": user
+	        	//loadingImg: "test",
+	        	user: user,
+	        	loading: false
 	        });
 	      }
-	      if(err){
-	      	console.log(err)
+	    })
+	    ee.on('initerr',err => {
+	      if(this.isMounted()){
+	        self.setState({ 
+	        	loading: false
+	        });
 	      }
 	    })	
 	},
@@ -84,23 +106,25 @@ const HomeComponent = React.createClass({
     				<br/>
     				<br/>
     				<h4>Are you a new user?</h4>
-    				<button type="button" className="btn btn-primary btn-lg btn-block" onClick={this.openModal}>Create Account</button>
+    				<button type="button" className="btn btn-primary btn-lg btn-block" onClick={this.openCreateModal}>Create Account</button>
 					<Modal
-					isOpen={this.state.modalIsOpen}
-					onRequestClose={this.closeModal}
+					isOpen={this.state.modalCreateIsOpen}
+					onRequestClose={this.closeCreateModal}
 					style={customStyles} >
-						<div>Create New Account Form</div>
+						<div className="text-center">Create New Account</div>
+						<br/>
 						<label>Select Name</label>
 						<form name="myform" ref="personaCreateForm">
 			                <fieldset className="form-group">
 			                  <input ref="cname" name="name" type="name" className="form-control" id="exampleName" placeholder="Persona Name"></input>
 			                </fieldset>
 			                <fieldset className="form-group">
-			                  <label>Select Default Ether Account</label>
-			                    <select ref="cgethaccount" name="account" className="form-control">
-			                      <option value="0">0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98</option>
-			                      <option value="1">0x2a65aca4d5fc5b5c859090a6c34d164135398226</option>
-			                    </select>
+			                	<label>Enter Password</label>
+			                  <input ref="cpass" name="pass" type="password" className="form-control" id="examplePass" placeholder="Password"></input>
+			                </fieldset>
+			                <fieldset className="form-group">
+			                	<label>Enter Password Again</label>
+			                  <input ref="cpass2" name="pass2" type="password" className="form-control" id="examplePass2" placeholder="Re-enter Password"></input>
 			                </fieldset>
 			                <fieldset className="form-group ">
 			                  <label>Persona Type</label>
@@ -109,15 +133,6 @@ const HomeComponent = React.createClass({
 			                      <option>Seller</option>
 			                    </select>
 			                </fieldset>
-			              <fieldset className="form-group">
-			                  <label htmlFor="personaHobbies">List some of your favorite Hobbies</label>
-			                  <p>Separated by commas</p>
-			                  <textarea ref="chobbies" name="hobbies" className="form-control" id="personaHobbies" ></textarea>
-			                </fieldset>         
-			                <fieldset className="form-group">
-			                 <label htmlFor="exampleInputFile">Upload an Image</label>
-			                 <input ref="cfile" name="file" type="file" className="form-control-file" id="exampleInputFile"></input>
-			                </fieldset> 
 			            </form>
 			            <button onClick={this.createAccount}>Create!</button>
 
@@ -126,7 +141,28 @@ const HomeComponent = React.createClass({
     				<p className="text-danger">This will publish new data to IPNS!</p>
     				<br/>
     				<h4>Already have an account?</h4>
-    				<Link to="/markets"><button type="button" className="btn btn-secondary btn-lg btn-block" onClick={this.initialize}>Sign In</button></Link>
+
+    				<button type="button" className="btn btn-secondary btn-lg btn-block" onClick={this.openSignModal}>Sign In</button>
+    					<Modal
+						isOpen={this.state.modalSignIsOpen}
+						onRequestClose={this.closeSignModal}
+						style={customStyles} >
+						<form name="myform" ref="personaCreateForm">	               
+			                <fieldset className="form-group">
+			                  <label>Select Account</label>
+			                    <select ref="cgethaccount" name="account" className="form-control">
+			                      <option value="0">0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98</option>
+			                      <option value="1">0x2a65aca4d5fc5b5c859090a6c34d164135398226</option>
+			                    </select>
+			                </fieldset>
+			                <fieldset className="form-group">
+			                	<label>Enter Password</label>
+			                  <input ref="cpass" name="pass" type="password" className="form-control" id="examplePass" placeholder="Password"></input>
+			                </fieldset>
+			            </form>
+			            <Link to="/markets"><button onClick={this.signIn}>Sign In!</button></Link>
+
+					</Modal>
     				<p>In the future you will have more sign in options. Multiple personas based on multiple IPFS IDs and Ethereum accounts are in the works.
     				   Currently defaults to your go-ipfs client ID and geth account 0</p>
     			</div>

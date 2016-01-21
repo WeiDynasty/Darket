@@ -1,10 +1,21 @@
+import React from 'react'
 import MarketAPI from '../js/libraries/marketapi-wrapper'
+import LoadingModalComponent from './loadingmodal'
 
 const AccountContainer = React.createClass({
-	initialize: function(){	    
-	    var user = new MarketAPI();
+	getInitialState: function() {
+	return { 
+		modalCreateIsOpen: false,
+		modalSignIsOpen: false,
+		loading: true,
+		heading: 'Checking For Account...'
+	 };
+	},
+	initialize: function(){	   
+	    var user = new MarketAPI()
+	    user.account.init()
 	    //example of using the netid api to get the eth balance
-	    var web3test = user.account.getBalance();
+	    var web3test = user.account.getBalance()
 	    console.log('Balance: '+web3test+' Ether')
 		var self = this 
 		self.setState({
@@ -14,25 +25,22 @@ const AccountContainer = React.createClass({
 	    var ee = user.account.getEventEmitter()
 	    ee.on('initdone',err => {
 	      if(!err && this.isMounted()){
-	      	console.log('finished initializing api')
-	      	swal({   
-	            title: "Success!",   
-	            text: 'You are now signed in and ready to use the markets',   
-	            type: "info",   
-	            confirmButtonText: "Close" 
-          	});
 	        self.setState({ 
-	        	"loadingImg": "test",
-	        	"user": user
+	        	loadingImg: "test",
+	        	user: user,
+	        	loading: false,
+	        	heading: 'You Are Logged In!'
 	        });
-	        self.props.handleUserIcon('test')
+	        //self.props.handleUserIcon('test')
 	      }
 	      if(err){
 	      	console.log(err)
 	      }
 	    })	
 	},
-	componentDidMount: function(){    	
+	componentDidMount: function(){
+		//this.props.test2
+		//console.log(this.props.user)    	
     	this.initialize()
     },
 	render: function() {
@@ -43,11 +51,20 @@ const AccountContainer = React.createClass({
 		<div>
 		<div className="row">
     		<div className="text-center">
-    		<h1>You Are Logged In!</h1>
+    		<h1>{this.state.heading}</h1>
     		<br/>
     		<br/>
-    		<h3>Account Information</h3>
+    		<h3>Profile</h3>
     			<div className="col-md-8 col-md-offset-2">
+    				
+						<img className="thumbnail" src="images/user.png"/>
+						<fieldset className="form-group">
+			                 <label htmlFor="exampleInputFile">Upload an Image</label>
+			                 <div className="col-md-8 col-md-offset-4">
+			                 <input ref="pfile" name="file2" type="file" className="form-control-file" id="updateProfilePic"></input>
+			            	</div>
+			            </fieldset>
+				
     				<br/>
     				<br/>
     				<table style={tablestyle}>
@@ -81,6 +98,7 @@ const AccountContainer = React.createClass({
     			</div>
     		</div>
 		</div>
+		<LoadingModalComponent loading={this.state.loading}/>
 		</div>
 		)
 	}

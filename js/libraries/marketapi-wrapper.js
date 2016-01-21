@@ -10,7 +10,6 @@ var MarketAPI = function(){
   var Web3 = require('web3')
   var web3 = new Web3()*/
   this.account = new MarketAPI(ipfs, web3)
-  this.account.init()
   this.done = true
 }
 

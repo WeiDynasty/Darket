@@ -11,17 +11,15 @@ import MarketsContainer from './marketscontainer'
 var App = React.createClass ({
 	getInitialState: function() {
 		return {
-			"loadingImg": 'images/user.png'
+			loadingImg: 'images/user.png'
 		}
 	},
-	handleUserIcon: function(i){
-		this.setState({
-			"loadingImg": i
-		})
+	test: function(){
+		console.log('test')
+		/*this.setState({
+			loadingImg: 'test'
+		})*/
 	},
-	componentDidMount: function() {
-   	 	window.addEventListener('icon', this.handleUserIcon);
-  	},
   	render: function() {
 	  	var logostyle = {
 	      height: '50px',
@@ -39,6 +37,7 @@ var App = React.createClass ({
 	    var userStyle = {
 	    	width: '40px'
 	    }
+	    //var test = this.test()
 	    //TODO: Maybe add boolen check to switch the logo color to a bright color if the api finds your user on landing so you know you are logged in.
 	    return (
 		  <div>
@@ -56,7 +55,7 @@ var App = React.createClass ({
 			      <li><a href="https://github.com/WeiDynasty/Market-Dapp">Github</a></li>
 			    </ul>
 			    <ul className="navbar-brand navbar-right" style={rightStyle}>
-			    	<Link to="/account" className="navbar-right"><img src={this.state.loadingImg} style={userStyle}></img></Link>
+			    	<Link to="/account" params={{test: "hello"}} className="navbar-right"><img src={this.state.loadingImg} style={userStyle}></img></Link>
 			    </ul>
 			    <ul className="navbar-brand navbar-right" style={rightStyle}>
 			    	<form className="navbar-form" role="search">
@@ -70,7 +69,7 @@ var App = React.createClass ({
 				</ul>
 			  </div>
 			</nav>
-			{this.props.children}
+			{React.cloneElement(this.props.children, {test: this.test()})}
 		  </div>
 	    )
 	}
@@ -80,7 +79,7 @@ render((
   <Router history={browserHistory}>
     <Route path="/" component={App}>
       <IndexRoute component={HomeComponent}/>
-      <Route path="/market" component={BodyContainer}/>
+      <Route path="/market/:term" component={BodyContainer}/>
       <Route path="/account" component={AccountContainer}/>
       <Route path="/product" component ={ProductContainer}/>
       <Route path="/markets" component ={MarketsContainer}/>

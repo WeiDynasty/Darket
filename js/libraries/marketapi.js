@@ -450,9 +450,15 @@ MarketAPI.prototype.checkForEthereum = function(){
 // Initialize API
 MarketAPI.prototype.init = function(done){
   if(this.isInit) return
-  this.web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'))   
+  this.web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'))
+  if(!this.checkForEthereum()){
+    this.ee.emit('initdone',undefined)
+    this.ee.removeEvent('initdone')
+  }   
   this.ipfs.id( (err, res) => {
     if(err){
+      this.ee.emit('initerr',undefined)
+      this.ee.removeEvent('initerr')
       swal({   
             title: "Error!",   
             text: 'IPFS Client Not Found',   

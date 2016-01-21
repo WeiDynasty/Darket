@@ -31,6 +31,8 @@
     "wolfy87-eventemitter": "^4.3.0"
   },
   "dependencies": {
-    "gulp": "^3.9.0"
+    "gulp": "^3.9.0",
+    "react": "^0.14.6",
+    "react-dom": "^0.14.6"
   }
 }
