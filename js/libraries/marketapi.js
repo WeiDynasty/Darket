@@ -129,307 +129,6 @@ MarketAPI.prototype.isUserProfile = function(addr,done){
   })
 }
 
-MarketAPI.prototype.searchUsers = function(){
-  // Look at our peers
-  this.ipfs.swarm.peers((err,r) => {
-    if(err) return console.log(err)
-    replyAsObj(r,true,(e,reply) => {
-      if(e){
-        this.ee.emit('error',e)
-        return console.log('There was an error while getting swarm peers:',e)
-      }
-      console.log('Checking',reply.Strings.length,'peers')
-      //reply.Strings.forEach(item => {
-      var f = (item, done) => {
-        var ss = item.split('/')
-        var n = ss[ss.length-1]
-        this.ee.once(n,(res,err) => done(err))
-        this.resolveIPNS(n)
-      }
-      asyncjs.eachSeries(reply.Strings,f.bind(this))
-    })
-  })
-  // Look for who has the correct version file, they probably have a profile
-  /*
-  this.ipfs.dht.findprovs(this.version_hash, (err,res) => {
-    if(err){
-      console.log('DHT FINDPROVS err',err)
-    } else if(res.readable){
-      console.log('DHT FINDPROVS stream',res)
-    } else {
-      console.log('DHT FINDPROVS string',res)
-    }
-  })*/
-  return this.ee
-}
-
-MarketAPI.prototype.getProfile = function(userID,done){
-  this.resolveIPNS(userID,(url,err) => {
-    if(err){
-      this.ee.emit('error',err)
-      done(err,null)
-    } else {
-      // Download actual profile
-      this.ipfs.cat(url+this.baseurl+'profile.json',(err2,res) => {
-        if(err2){
-          this.ee.emit('error',err2)
-          done(err2,null)
-        } else {
-          // TODO: JSON parse error handling
-          var p = JSON.parse(res.toString())
-          this.ee.emit('profile for '+userID,p)
-          done(null,p)
-        }
-      })
-      // Get other info
-      this.ipfs.ls(url+this.baseurl+'boards/',(err2,res) => {
-        if(!err2){
-          var l = res.Objects[0].Links.map(i => {
-            return { name: i.Name, hash: i.Hash }
-          })
-          this.ee.emit('boards for '+userID,l)
-        } else {
-          this.ee.emit('error',err2)
-        }
-      })
-    }
-    return true // remove myself from listeners
-  })
-  return this.ee
-}
-
-MarketAPI.prototype.getBoardSettings = function(userID,board){
-  if(!userID){
-    return console.log('Invalid USERID',userID)
-  }
-  if(!board){
-    return console.log('Invalid BOARD',board)
-  }
-  this.resolveIPNS(userID,(r,e) => {
-    if(e){
-      this.ee.emit('error',e)
-    } else {
-      var url = r+this.baseurl+'boards/'+board+'/settings.json'
-      this.ipfs.cat(url,(err,resp) => {
-        // TODO: error handling json conversion
-        var settings = JSON.parse(resp.toString())
-        if(err){
-          this.ee.emit('error',err)
-        } else {
-          // SETTINGS file is here, need to parse it a little bit
-          this.ee.emit('settings for '+board+'@'+userID,settings,r)
-          if(settings.whitelist == true){
-            // Get the whitelist
-            var url = r+this.baseurl+'boards/'+board+'/whitelist'
-            this.ipfs.cat(url,(err,res) => {
-              if(err){
-                this.ee.emit('error',err)
-                // Emit an empty whitelist.
-                this.ee.emit('whitelist for '+board+'@'+userID,[])
-              } else replyAsObj(res,false,(err,whitelist) => {
-                // Send whitelist
-                var w = whitelist.split(' ').map(x => x.trim())
-                this.ee.emit('whitelist for '+board+'@'+userID,w)
-              })
-            })
-          }
-          if(!settings.whitelist_only && !settings.approval_required && settings.blacklist == true){
-            // Get the blacklist
-            var u = r+this.baseurl+'boards/'+board+'/blacklist'
-            this.ipfs.cat(u,(err,blacklist) => {
-              if(err){
-                this.ee.emit('error',err)
-              } else {
-                // Send blacklist
-                var w = blacklist.split(' ')
-                this.emit('blacklist for '+board+'@'+userID,w)
-              }
-            })
-          }
-        }
-      })
-    }
-    return true // remove myself from listeners
-  })
-  return this.ee
-}
-
-MarketAPI.prototype.downloadPost = function(hash,adminID,board,op,done){
-  console.log('Downloading post',hash)
-  this.ipfs.cat(hash,(err2,r) => {
-    if(err2){
-      this.ee.emit('error',err2)
-      console.log('Could not download post',hash,'of',board+'@'+adminID)
-      if(done && done.apply) done(err2)
-    } else {
-      replyAsObj(r,true,(err,post) => {
-        // TODO: add JSON parsing error handling
-        post.hash = hash
-        if(op) post.op = op // Inject op
-        if(board){
-          if(adminID) this.ee.emit('post in '+board+'@'+adminID,post,hash)
-          else this.ee.emit('post in '+board,post,hash)
-        }
-        this.ee.emit(hash,post,adminID,board)
-        if(done && done.apply) done(null,post)
-      })
-    }
-  })
-  return this.ee
-}
-
-MarketAPI.prototype.retrieveListOfApproved = function(what,addr,adminID,board){
-  var a = addr+this.baseurl+'boards/'+board+'/approved/'+what+'/'
-  this.ipfs.ls(a,(err,res) => {
-    if(err){
-      this.ee.emit('error',err)
-    } else {
-      // Send approved posts list
-      var ret = res.Objects[0].Links.map(item => {
-        return { date: item.Name, hash: item.Hash }
-      })
-      this.emit('approved '+what+' for '+board+'@'+adminID,ret)
-    }
-  })
-}
-
-MarketAPI.prototype.getAllowedContentProducers = function(adminID,board,options){
-  if(!options) return
-  this.ee.on('settings for '+board+'@'+adminID,function(settings,addr){
-    // Get stuff based on settings
-    if(settings.approval_required == true){
-      // Get approved posts list
-      if(options.posts) this.retrieveListOfApproved('posts',addr,adminID,board)
-      // Get approved comments list
-      if(options.comments) this.retrieveListOfApproved('comments',addr,adminID,board)
-    } else if(settings.whitelist_only == true){
-      // TODO: emit all whitelisted users
-    } else if(settings.blacklist == true){
-      // TODO: emit all users not in the blacklist
-    }
-  })
-  this.getBoardSettings(adminID,board)
-  return this.ee
-}
-
-MarketAPI.prototype.getPostsInBoard = function(adminID,board){
-  if(adminID){
-    this.ee.on('approved posts for '+board+'@'+adminID,ret => {
-      // Automatically download approved posts
-      ret.forEach(item => this.downloadPost(item.hash,adminID,board))
-    })
-    this.ee.on('whitelist for '+board+'@'+adminID, whitelist => {
-      // download posts for each user in whitelist
-      whitelist.forEach(item => {
-        this.getUserPostListInBoard(item,board,(err,postList) => {
-          postList.forEach( i => this.downloadPost(i.hash,adminID,board,item))
-        })
-      })
-    })
-    // Get allowed content and content producers
-    this.getAllowedContentProducers(adminID,board,{ posts: true })
-    // Get the admin's posts
-    this.getUserPostListInBoard(adminID,board,(err,res) => {
-      if(err){
-        console.log(err)
-      } else res.forEach(item => this.downloadPost(item.hash,adminID,board,adminID))
-    })
-  } else {
-    // TODO: Download all posts in board from everyone
-    // Download my posts
-    this.getUserPostListInBoard(this.id,board,(err,res) => {
-      if(err){
-        console.log(err)
-      } else res.forEach(item => this.downloadPost(item.hash,undefined,board,this.id))
-    })
-  }
-  return this.ee
-}
-
-MarketAPI.prototype.getUserPostListInBoard = function(user,board,done){
-  this.resolveIPNS(user,(url,err) => {
-    if(err){
-      this.ee.emit('error',err)
-      done(err)
-    } else this.ipfs.ls(url+this.baseurl+'posts/'+board,(e,r) => {
-      if(e){
-        this.ee.emit('error',e)
-        done(e)
-      } else if(r && !r.split){
-        console.log('Found',r.Objects[0].Links.length,'posts in',board,'at',user)
-        this.ee.emit('post count',board,user,r.Objects[0].Links.length)
-        var l = r.Objects[0].Links.map(i => {
-          return { date: i.Name, hash: i.Hash }
-        })
-        done(null,l)
-      }
-    })
-    return true // remove myself from listeners
-  })
-  return this.ee
-}
-
-MarketAPI.prototype.downloadComment = function(hash,adminID,board,done){
-  this.ipfs.cat(hash,(err2,r) => {
-    if(err2){
-      this.ee.emit('error',err2)
-      console.log('Could not download comment',hash,'of',board+'@'+adminID)
-      if(done && done.apply) done(err2)
-    } else {
-      // TODO: add JSON parsing error handling
-      var cmnt = JSON.parse(r.toString())
-      cmnt.hash = hash
-      this.ee.emit(hash,cmnt,adminID,board)
-      this.ee.emit('comment for '+cmnt.parent,cmnt)
-      if(done && done.apply) done(null,cmnt)
-    }
-  })
-  return this.ee
-}
-
-MarketAPI.prototype.getCommentsFor = function(parent,board,adminID){
-  if(!parent || !board || !adminID){
-    return console.log('malformed arguments:',parent,board,adminID)
-  }
-  this.ee.on('approved comments for '+board+'@'+adminID,ret => {
-    ret.forEach(item => this.downloadComment(item.hash,adminID,board))
-  })
-  // get the admin's comments
-  this.getUserCommentList(parent,adminID,(err,res) => {
-    if(!err){
-      res.forEach(item => this.downloadComment(item.hash,adminID,board))
-    }
-  })
-  this.getAllowedContentProducers(adminID,board,{ comments: true })
-}
-
-MarketAPI.prototype.getUserCommentList = function(parent,user,done){
-  if(!parent || !user){
-    return console.log('Malformed arguments:',parent,user)
-  }
-  this.resolveIPNS(user,(url,err) => {
-    if(err){
-      this.ee.emit('error',err)
-      done(err)
-    } else this.ipfs.ls(url+this.baseurl+'comments/'+parent,(e,r) => {
-      if(e){
-        this.ee.emit('error',e)
-        done(e)
-      } else if(r && !r.split){
-        if(r.Objects && r.Objects[0]){ // If this is not true, then there are no comments
-          console.log('Found',r.Objects[0].Links.length,'comments for',parent,'at',user)
-          var l = r.Objects[0].Links.map(i => {
-            return { date: i.Name, hash: i.Hash }
-          })
-          done(null,l)
-        }
-      }
-    })
-    return true // remove myself from listeners
-  })
-  return this.ee
-}
-
 MarketAPI.prototype.checkForEthereum = function(){
   var self = this
   if(!web3.isConnected()) {
@@ -504,41 +203,52 @@ MarketAPI.prototype.getMarkets = function(){
   return this.marketsList
 }
 
-MarketAPI.prototype.createUser = function(){
-  console.log('Registering a new user with IPFS ID ' + this.id)
-  console.log('Checking to see if user is already registered')
-  this.isUserProfile(this.id,(isit,err) => {
-    //this was getting pulled from temp storage
-    //else if(this.users[n] != url) this.isUserProfile(url,(isit,err) => {
-    if(isit){
-      console.log(this.id,' has an account already')
-    } else {
-      //do async waterfall and setup the files api for the new user. 
+MarketAPI.prototype.getAddresses = function(active){
+  if(active == false){
+    this.web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'))
+    if(!web3.isConnected()) {
+    swal({   
+            title: "Error!",   
+            text: 'Geth account is not connected.',   
+            type: "error",   
+            confirmButtonText: "Close" 
+          });
+    return false
     }
-  })
+  }
+  var addys = this.web3.eth.accounts
+  return addys
 }
 
-MarketAPI.prototype.addPersona = function(persona, done){
-  console.log('Creating new persona')
+MarketAPI.prototype.createAccount = function(persona, active, done){
+  if(active == false){
+    this.web3.setProvider(new web3.providers.HttpProvider('http://localhost:8545'))
+  }
+  console.log('Creating new account')
   try {
     var profile_str = JSON.stringify(persona)
   } catch (e) {
-    console.log('Error, invalid persona data:', e)
+    console.log('Error, invalid account data:', e)
     return done(e)
   }
+  console.log(persona)
+  //not working
+  /*var self = this
+  self.ee.emit('createdone',undefined)
+  self.ee.removeEvent('createdone')*/
 
   asyncjs.waterfall([
     // Create required directories
     // Might do this in the account creation process and hope that it doesn't get lost, could need checks here
-    cb => this.ipfs.files.mkdir('/netid-account/personas', { p: true }, cb),
+    cb => this.ipfs.files.mkdir('/market-account', { p: true }, cb),
     (e, cb) => {
       // Remove old profile files if present
-      var path = '/netid-account/personas/personaSchema.json'
+      var path = '/market-account/accountInfo.json'
       console.log('removing path ' +path)
       this.ipfs.files.rm(path, { r: true }, (err, res) => {
         if (err) 
           cb(err)
-        console.log('removed old personaSchema json file...')
+        console.log('removed old account json file...')
         cb()
       })
     },
@@ -550,7 +260,7 @@ MarketAPI.prototype.addPersona = function(persona, done){
       // Move profile into mfs
       console.log('added profile to IPFS:', res.Hash)
       var profilepath = '/ipfs/' + res.Hash
-      this.ipfs.files.cp([profilepath, '/netid-account/personas/personaSchema.json'], cb)
+      this.ipfs.files.cp([profilepath, '/market-account/accountInfo.json'], cb)
     },
     (e, cb) => this.ipfs.files.stat('/', cb),
     (res, cb) => {
@@ -631,5 +341,10 @@ MarketAPI.prototype.setEthereumAbi = function (contractName){
     default: console.log("No Ethereum ABI found for contract " + contractName);
   }
 }
+
+MarketAPI.prototype.setAccount = function (accountNum){
+  var accountNum = accountNum
+}
+
 
 module.exports = MarketAPI

@@ -14,12 +14,6 @@ var App = React.createClass ({
 			loadingImg: 'images/user.png'
 		}
 	},
-	test: function(){
-		console.log('test')
-		/*this.setState({
-			loadingImg: 'test'
-		})*/
-	},
   	render: function() {
 	  	var logostyle = {
 	      height: '50px',
@@ -69,7 +63,7 @@ var App = React.createClass ({
 				</ul>
 			  </div>
 			</nav>
-			{React.cloneElement(this.props.children, {test: this.test()})}
+			{this.props.children}
 		  </div>
 	    )
 	}

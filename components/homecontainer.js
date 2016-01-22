@@ -28,16 +28,48 @@ const HomeComponent = React.createClass({
 	},
 
 	openCreateModal: function() {
-	//this.initialize()
+		//this.initialize()
+		var addys
+		if(this.user == undefined){
+			var user = new MarketAPI()
+			addys = user.account.getAddresses(false)
+		}else{
+			addys = user.account.getAddresses(true)
+		}
+		var opt = []
+		console.log(addys)
+		for(var i=0; i < addys.length; i++){
+			var rand = Math.floor(Math.random()*100000000000000000)
+			var st_i = i.toString()
+			opt.push(<option value={st_i} key={rand}>{addys[i]}</option>)
+		}
 		this.setState({
 			modalCreateIsOpen: true,
-			showLoading: false
-		});
+			showLoading: false,
+			options: opt
+		})
 	},
 	openSignModal: function() {
+		var addys
+		if(this.user == undefined){
+			var user = new MarketAPI()
+			addys = user.account.getAddresses(false)
+		}else{
+			addys = user.account.getAddresses(true)
+		}
+		var opt = []
+		var addys = user.account.getAddresses(false)
+		console.log(addys)
+		for(var i=0; i < addys.length; i++){
+			var rand = Math.floor(Math.random()*100000000000000000)
+			var st_i = i.toString()
+			opt.push(<option value={st_i} key={rand}>{addys[i]}</option>)
+		}
 		this.setState({
 			modalSignIsOpen: true,
-			showLoading: false
+			showLoading: false,
+			options: opt,
+			user: user
 		});
 	},
 	closeSignModal: function() {
@@ -51,15 +83,50 @@ const HomeComponent = React.createClass({
 		});
 	},
 	createAccount: function(){
+		var newAccount = {
+			accountName: "",
+			ethAddress: "",
+			pass: "",
+			accountType: ""
+		}
+		newAccount.accountName = this.refs.cname.value
+		newAccount.pass = this.refs.cpass.value
+		newAccount.accountType = this.refs.ctype.value
 		this.setState({
 			modalCreateIsOpen: false,
 			loading: true
 		})
-		this.initialize()
-		console.log(this.refs.cname.value)
-		console.log('from createAccount() '+this.state.user)
+		if(this.user == undefined){
+			console.log('you are not logged in')
+			var user = new MarketAPI()
+			//not working
+			/*var ee = user.account.getEventEmitter()
+			user.account.createAccount(newAccount, false)
+			user.account.ee.on('createdone',err => {
+	      	console.log('finished initializing api')
+	      	swal({   
+	            title: "Success!",   
+	            text: 'You are now signed in and ready to use the markets',   
+	            type: "info",   
+	            confirmButtonText: "Close" 
+          	});
+	        self.setState({ 
+	        	//loadingImg: "test",
+	        	user: user,
+	        	loading: false
+	        });
+	    })*/
+		}else{
+			console.log('you are logged in')
+			user.account.createAccount(newAccount, true)
+		}
+		//this.initialize()
+		//console.log(this.refs.cname.value)
 	},
 	signIn: function(){
+		var accountNum = this.refs.cgethaccount.value
+		console.log(accountNum)
+		this.state.user.account.setAccount(accountNum)
 		this.setState({modalSignIsOpen: false})
 	},
 	initialize: function(){    
@@ -126,6 +193,13 @@ const HomeComponent = React.createClass({
 			                	<label>Enter Password Again</label>
 			                  <input ref="cpass2" name="pass2" type="password" className="form-control" id="examplePass2" placeholder="Re-enter Password"></input>
 			                </fieldset>
+			                <fieldset className="form-group">
+			                  <h7>Currently you must register a pre-created unlocked account</h7><br/><h7>until I build client side account management in</h7>
+			                  <label>Select Account</label>
+			                    <select ref="cgethaccount" name="account" className="form-control">
+			                      {this.state.options}
+			                    </select>
+			                </fieldset>
 			                <fieldset className="form-group ">
 			                  <label>Persona Type</label>
 			                    <select ref="ctype" name="personaType" className="form-control">
@@ -151,8 +225,7 @@ const HomeComponent = React.createClass({
 			                <fieldset className="form-group">
 			                  <label>Select Account</label>
 			                    <select ref="cgethaccount" name="account" className="form-control">
-			                      <option value="0">0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98</option>
-			                      <option value="1">0x2a65aca4d5fc5b5c859090a6c34d164135398226</option>
+			                      {this.state.options}
 			                    </select>
 			                </fieldset>
 			                <fieldset className="form-group">

@@ -83,7 +83,8 @@ const MarketsComponent = React.createClass({
 			"displayRows":rows
 		})
 	},
-	componentDidMount: function(){    	
+	componentDidMount: function(){
+		const accountNum = this.props.params.account 	
     	this.initialize()
     	this.getMarkets()
     },
