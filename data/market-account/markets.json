@@ -1,0 +1,13 @@
+[
+	{
+		"id": "1337",
+		"name": "Voxelot's Space Lab",
+		"admin": "0x6737d20a2452fee7c86b547be3bea096b60f3321",
+		"description": "This is the place for all of your warp travel needs!",
+		"contract": "0x6737d20a2452fee7c86b547be3bea096b60f3321",
+		"filter": [
+			"test",
+			"flag"
+		]
+	}
+]

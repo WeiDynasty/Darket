@@ -2,6 +2,7 @@ import React from 'react'
 import { render } from 'react-dom'
 import { Router, Route, IndexRoute, Link, IndexLink, browserHistory } from 'react-router'
 import Modal from 'react-modal'
+import LoadingModalComponent from './loadingmodal'
 
 const customStyles = {
   content : {
@@ -16,9 +17,12 @@ const customStyles = {
 
 const BodyContainer = React.createClass({
 	getInitialState: function() {
+			console.log(this.props.user)
 		return { 
 			modalIsOpen: false,
-			loading: true
+			displayProd: [],
+			prodsList: [],
+			catrows: []
 		};
 	},
 	openModal: function() {
@@ -28,27 +32,118 @@ const BodyContainer = React.createClass({
 		this.setState({modalIsOpen: false});
 	},
 	createProduct: function(){
-		this.setState({modalIsOpen: false});
+	    var url = ""
+    	var rows = []
+		var self = this
+		var newProduct = {
+			id: "",
+			name: "",
+			price: "",
+			description: "",
+			category: "",
+			contract: "",
+			quantity: "",
+			img: "/ipfs/Qma3hV1MLwSMjey2ZyaHaRP4UaKE4m9Hbc4nR8gArD3Rs4"
+		}
+		newProduct.id = Math.floor(Math.random()*100000000000000000)
+		newProduct.name = self.refs.pname.value
+		newProduct.description = self.refs.pdesc.value
+		newProduct.category = self.refs.pcat.value
+		newProduct.quantity = self.refs.pquant.value
+		newProduct.price = self.refs.pprice.value
+
+		console.log(newProduct)
+
+		self.props.user.account.createProductContract(newProduct, self.state.prodsList, self.props.params.term, self.refs.pprice.value)
+
+		self.setState({
+			loading: true
+		})
+		//not working
+		var ee = self.props.user.account.getEventEmitter()
+		ee.on('productcontract',err => {
+	      	if(!err && self.isMounted()){
+		      	console.log('finished creating product')
+		      	swal({   
+		            title: "Success!",   
+		            text: 'Your product has been created',   
+		            type: "info",   
+		            confirmButtonText: "Close" 
+	          	});
+		        for(var i=0; i<self.props.user.account.newProductsList.length; i++){
+		    		var rand = Math.floor(Math.random()*100000000000000000)
+		    		url = '/product/'+self.props.user.account.newProductsList[i].contract
+		    		rows.push(<div className="column" key={rand}>
+						<img className="thumbnail" src="http://localhost:8080/ipfs/Qma3hV1MLwSMjey2ZyaHaRP4UaKE4m9Hbc4nR8gArD3Rs4"/>
+						<h5>{self.props.user.account.newProductsList[i].description}</h5>
+						<p>{self.props.user.account.newProductsList[i].price}</p>
+						<Link to={url} className="btn btn-primary btn-lg btn-block">Buy</Link>
+					</div>)
+		    	}
+				self.setState({
+					modalIsOpen: false,
+					displayProd: rows,
+					prodsList: self.props.user.account.newProductsList,
+					loading: false
+				})
+			}
+		})
 	},
 	getCategories: function(){
-		var cat = 'test'
+		var cat = ""
 	    var url = '/market/cat/'+cat
     	var rows = []
-    	
-    	for(var i =0; i<18; i++){
+    	console.log(this.state.prodsList)
+    	for(var i =0; i<this.state.prodsList.length; i++){
     		var rand = Math.floor(Math.random()*100000000000000000)
 /*    		if((i % 10) == 0){
     			rows.push(</tr><tr><td key={rand}><Link to={url}><h5>[{cat}]</h5></Link></td>)
     		}*/
-    		rows.push(<td key={rand}><Link to={url}><h5>[{cat}]</h5></Link></td>)
+    		rows.push(<td key={rand}><Link to={url}><h5>[{this.state.prodsList[i].category}]</h5></Link></td>)
     	}
 
     	this.setState({
-    		"catrows": rows
+    		catrows: rows
     	})
 	},
+	getProducts: function(){
+		var url = ""
+		var url2 = ""
+    	var rows = []
+    	var rows2 = []
+    	var rand = 0
+		this.props.user.account.getProducts(this.props.params.term)
+
+		this.props.user.account.ee.on('products',err => {
+	      if(!err && this.isMounted()){
+	      	for(var i=0; i<this.props.user.account.productsList.length; i++){
+	    		rand = Math.floor(Math.random()*100000000000000000)
+	    		url = '/product/'+this.props.user.account.productsList[i].id
+	    		url2 = '/product/cat/'+this.props.user.account.productsList[i].category
+
+	    		rows.push(<div className="column" key={rand}>
+					<img className="thumbnail" src="http://localhost:8080/ipfs/Qma3hV1MLwSMjey2ZyaHaRP4UaKE4m9Hbc4nR8gArD3Rs4"/>
+					<h5>{this.props.user.account.productsList[i].description}</h5>
+					<p>{this.props.user.account.productsList[i].price}</p>
+					<Link to={url} className="btn btn-primary btn-lg btn-block">Buy</Link>
+				</div>)
+
+				rows2.push(<td key={rand}><Link to={url2}><h5>[{this.props.user.account.productsList[i].category}]</h5></Link></td>)
+			}	
+			this.setState({
+				displayProd:rows,
+				catrows: rows2,
+				prodsList: this.props.user.account.productsList
+			})
+	      }
+	      if(err){
+	      	console.log(err)
+	      }
+	    })
+	},
 	componentDidMount: function() {
-		this.getCategories()
+		this.getProducts()
+		//this.getCategories()
     	// from the path `/api/search/:term`
     	const term = this.props.params.term
     	console.log(term)
@@ -87,19 +182,20 @@ const BodyContainer = React.createClass({
 		                </fieldset>
 		                <fieldset className="form-group">
 		                  <label htmlFor="rules">Product Description</label>
-		                  <textarea ref="crules" name="hobbies" className="form-control" id="rules" ></textarea>
+		                  <textarea ref="pdesc" name="desc" className="form-control" id="desc" ></textarea>
+		                </fieldset>
+		                <fieldset className="form-group">
+		                	<label htmlFor="category">Category</label>
+		                	<input ref="pcat" type="text" id="middle-label" placeholder="Stuff"/>
+		                </fieldset>
+		                <fieldset className="form-group">
+		                	<label htmlFor="price">Price</label>
+		                	<input ref="pprice" type="number" id="middle-label" placeholder="Stuff"/>
 		                </fieldset>
 		                <fieldset className="form-group">
 		                	<label htmlFor="quantity">Product Quantity</label>
-		                	<input type="text" id="middle-label" placeholder="One fish two fish"/>
-		                </fieldset>	
-		                <fieldset className="form-group">
-		                  <label>Select Admin Account</label>
-		                    <select ref="cgethaccount" name="account" className="form-control">
-		                      <option value="0">0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98</option>
-		                      <option value="1">0x2a65aca4d5fc5b5c859090a6c34d164135398226</option>
-		                    </select>
-		                </fieldset>         
+		                	<input ref="pquant" type="text" id="middle-label" placeholder="One fish two fish"/>
+		                </fieldset>	         
 		                <fieldset className="form-group">
 		                 <label htmlFor="exampleInputFile">Upload an Image</label>
 		                 <input ref="cfile" name="file" type="file" className="form-control-file" id="exampleInputFile"></input>
@@ -109,30 +205,7 @@ const BodyContainer = React.createClass({
 
 				</Modal>
 			<div className="row small-up-2 large-up-4">
-				<div className="column">
-					<img className="thumbnail" src="http://localhost:8080/ipfs/Qma3hV1MLwSMjey2ZyaHaRP4UaKE4m9Hbc4nR8gArD3Rs4"/>
-					<h5>Nulla At Nulla Justo, Eget</h5>
-					<p>$400</p>
-					<Link to="/product" className="btn btn-primary btn-lg btn-block">Buy</Link>
-				</div>
-				<div className="column">
-					<img className="thumbnail" src="http://localhost:8080/ipfs/QmS5TY4HREHXFjYuY1xnfTfNNVUC3cFNnTx2jbLsH4aJkn"/>
-					<h5>Nulla At Nulla Justo, Eget</h5>
-					<p>$400</p>
-					<Link to="/product" className="btn btn-primary btn-lg btn-block">Buy</Link>
-				</div>
-				<div className="column">
-					<img className="thumbnail" src="http://placehold.it/300x400"/>
-					<h5>Nulla At Nulla Justo, Eget</h5>
-					<p>$400</p>
-					<a href="#" className="btn btn-primary btn-lg btn-block">Buy</a>
-				</div>
-				<div className="column">
-					<img className="thumbnail" src="http://placehold.it/300x400"/>
-					<h5>Nulla At Nulla Justo, Eget</h5>
-					<p>$400</p>
-					<a href="#" className="btn btn-primary btn-lg btn-block">Buy</a>
-				</div>
+				{this.state.displayProd}
 			</div>
 			<br></br>
 			<hr/>
@@ -279,6 +352,7 @@ const BodyContainer = React.createClass({
 					</div>
 				</div>
 			</div>
+			<LoadingModalComponent loading={this.state.loading}/>
 		</div>
 		);
 	}

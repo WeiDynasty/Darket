@@ -20,72 +20,139 @@ const MarketsComponent = React.createClass({
 	getInitialState: function() {
 		return { 
 			modalIsOpen: false,
-			loading: true
+			loading: false,
+			user: this.props.user,
+			displayMar: [],
+			markets: []
 		};
 	},
 
 	openModal: function() {
-		this.setState({modalIsOpen: true})
+		var addys
+		if(this.user == undefined){
+			var user = new MarketAPI()
+			addys = user.account.getAddresses(false)
+		}else{
+			addys = user.account.getAddresses(true)
+		}
+		var opt = []
+		for(var i=0; i < addys.length; i++){
+			var st_i = i.toString()
+			for(var z = 0; z < this.props.userData.length; z++){
+				if(addys[i] == this.props.userData[z].ethaddr){
+					var rand = Math.floor(Math.random()*100000000000000000)
+					opt.push(<option value={addys[i]} key={rand}>{this.props.userData[z].name}</option>)
+				}
+			}
+		}
+		this.setState({
+			modalIsOpen: true,
+			adminopts: opt
+		})
 	},
 
 	closeModal: function() {
 		this.setState({modalIsOpen: false})
 	},
 	createMarket: function(){
-		console.log(this.refs.mname.value)
-		this.setState({modalIsOpen: false})
-	},
-	initialize: function(){	    
-	    var user = new MarketAPI()
-	    user.account.init()
-	    //example of using the netid api to get the eth balance
-	    var web3test = user.account.getBalance()
-	    console.log('Balance: '+web3test+' Ether')
-		var self = this 
-		self.setState({
-			api: user
+		var newMarket = {}
+		var newList = []
+		newMarket.id = Math.floor(Math.random()*100000000000000000)
+		newMarket.name = this.refs.mname.value
+		newMarket.admin = this.refs.cgethaccount.value
+		newMarket.description = this.refs.cdesc.value
+		newMarket.filter = this.refs.crules.value
+		console.log('newList before setting equal to this.state.markets before pushing markets')
+		console.log(newList)
+		console.log('this.state.markets before setting equal to newList')
+		console.log(this.state.markets)
+		newList = this.state.markets
+		console.log('newList after')
+		console.log(newList)
+		console.log('this.state.markets after')
+		console.log(this.state.markets)
+
+		//newList.push(newMarket)
+		console.log('no longer pushing newList')
+		console.log(newList)
+		console.log(this.state.markets)
+
+		this.props.user.account.createMarketContract(newMarket, this.state.markets)
+
+		this.setState({
+			loading: true
 		})
-	    if(!this.isMounted()) return
-	    var ee = user.account.getEventEmitter()
-	    ee.on('initdone',err => {
+		var ee = this.props.user.account.getEventEmitter()
+		var url = ""
+    	var rows = []
+    	var rand = 0
+	    ee.on('marketcontract',err => {
 	      if(!err && this.isMounted()){
-	      	console.log('finished initializing api')
+	      	console.log('finished creating contract')
 	      	swal({   
 	            title: "Success!",   
-	            text: 'You are now signed in and ready to use the markets',   
+	            text: 'Your market has been created',   
 	            type: "info",   
 	            confirmButtonText: "Close" 
           	});
-	        self.setState({ 
-	        	"loadingImg": "test",
-	        	"user": user,
-	        	loading: false
-	        });
+	        for(var i=0; i<newList.length; i++){
+	    		rand = Math.floor(Math.random()*100000000000000000)
+	    		url = '/market/'+this.props.user.account.newMarketsList[i].contract
+	    		rows.push(<tr key={rand}>
+						    <td><Link to={url}>{this.props.user.account.newMarketsList[i].name}</Link></td>
+						    <td>{this.props.user.account.newMarketsList[i].contract}</td>
+						    <td>{this.props.user.account.newMarketsList[i].description}</td>  
+						</tr>)
+	    	}
+			this.setState({
+				modalIsOpen: false,
+				markets: newList,
+				displayMar:rows,
+				loading: false
+			})
 	        //self.props.handleUserIcon('test')
 	      }
 	      if(err){
 	      	console.log(err)
 	      }
-	    })	
+	    })
+	    ee.on('marketcontractfail', function(){
+	    	console.log('CREATING MARKET FAILED')
+	    	self.setState({ 
+	    		user: user,
+	        	loading: false
+	        })
+	    })
 	},
 	getMarkets: function(){
-		var addr = '0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98'
-		var marAddr = addr
-	    var url = '/market/'+marAddr
+		var markets = this.props.user.account.getMarkets()
+	    var url = ""
     	var rows = []
-    	var rand = Math.floor(Math.random()*100000000000000000)
-    	rows.push(<tr key={rand}>
-					    <td><Link to={url}>Voxelot's Spacelab</Link></td>
-					    <td>0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98</td>
-					    <td>This is THE place for all of your warp drive engine parts and repairs, probing equipment, and much more!</td>  
-					</tr>)
-		this.setState({
-			"displayRows":rows
-		})
+    	var rand = 0
+    	this.props.user.account.ee.on('markets',err => {
+	      if(!err && this.isMounted()){
+	      	for(var i=0; i<this.props.user.account.marketsList.length; i++){
+	    		rand = Math.floor(Math.random()*100000000000000000)
+	    		url = '/market/'+this.props.user.account.marketsList[i].contract
+	    		rows.push(<tr key={rand}>
+						    <td><Link to={url}>{this.props.user.account.marketsList[i].name}</Link></td>
+						    <td>{this.props.user.account.marketsList[i].contract}</td>
+						    <td>{this.props.user.account.marketsList[i].description}</td>  
+						</tr>)
+	    	}
+			this.setState({
+				displayMar:rows,
+				markets: this.props.user.account.marketsList
+			})
+	      }
+	      if(err){
+	      	console.log(err)
+	      }
+	    })
 	},
-	componentDidMount: function(){
-		const accountNum = this.props.params.account 	
-    	this.initialize()
+	componentDidMount: function(){	
+    	//this.initialize()
+    	console.log(this.props.user)
     	this.getMarkets()
     },
 	render: function() {
@@ -111,19 +178,15 @@ const MarketsComponent = React.createClass({
 			                  <input ref="mname" name="name" type="name" className="form-control" id="exampleName" placeholder="My New Market!"></input>
 			                </fieldset>
 			                <fieldset className="form-group">
-			                  <label>Select Public Market?</label>
-			                    <select ref="cgethaccount" name="account" className="form-control">
-			                      <option value="true">True</option>
-			                      <option value="false">False</option>
-			                    </select>
-			                </fieldset>
-			                <fieldset className="form-group">
 			                  <label>Select Admin Account</label>
 			                    <select ref="cgethaccount" name="account" className="form-control">
 			                      <option value="">None</option>
-			                      <option value="0">0xfbb1b73c4f0bda4f67dca266ce6ef42f520fbb98</option>
-			                      <option value="1">0x2a65aca4d5fc5b5c859090a6c34d164135398226</option>
+			                      {this.state.adminopts}
 			                    </select>
+			                </fieldset>
+			                <fieldset className="form-group">
+			                  <label htmlFor="desc">Market Description</label>
+			                  <textarea ref="cdesc" name="desc" className="form-control" id="desc" ></textarea>
 			                </fieldset>
 			              	<fieldset className="form-group">
 			                  <label htmlFor="rules">Market Rules</label>
@@ -152,7 +215,7 @@ const MarketsComponent = React.createClass({
 					    <td>Market Address</td>
 					    <td>Description</td> 
 					  </tr>
-					  	{this.state.displayRows}
+					  	{this.state.displayMar}
 					  </tbody>
 					</table>
     			</div>

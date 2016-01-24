@@ -19,11 +19,15 @@ const customStyles = {
 
 const HomeComponent = React.createClass({
 	getInitialState: function() {
+		console.log(this.props)
 	return { 
 		modalCreateIsOpen: false,
 		modalSignIsOpen: false,
-		loading: false
-		//user: this.props.user
+		user: this.props.user,
+		userData: this.props.userData,
+		loadingImg: this.props.loadingImg,
+		loading: false,
+		ee:{}
 	 };
 	},
 
@@ -45,31 +49,31 @@ const HomeComponent = React.createClass({
 		}
 		this.setState({
 			modalCreateIsOpen: true,
-			showLoading: false,
 			options: opt
 		})
 	},
 	openSignModal: function() {
 		var addys
-		if(this.user == undefined){
+		if(this.props.user == undefined){
+			console.log('this.user was undefined')
 			var user = new MarketAPI()
 			addys = user.account.getAddresses(false)
 		}else{
-			addys = user.account.getAddresses(true)
+			addys = this.props.user.account.getAddresses(true)
 		}
 		var opt = []
-		var addys = user.account.getAddresses(false)
-		console.log(addys)
 		for(var i=0; i < addys.length; i++){
-			var rand = Math.floor(Math.random()*100000000000000000)
 			var st_i = i.toString()
-			opt.push(<option value={st_i} key={rand}>{addys[i]}</option>)
+			for(var z = 0; z < this.props.userData.length; z++){
+				if(addys[i] == this.props.userData[z].ethaddr){
+					var rand = Math.floor(Math.random()*100000000000000000)
+					opt.push(<option value={st_i} key={rand}>{this.props.userData[z].name}</option>)
+				}
+			}
 		}
 		this.setState({
 			modalSignIsOpen: true,
-			showLoading: false,
-			options: opt,
-			user: user
+			options: opt
 		});
 	},
 	closeSignModal: function() {
@@ -83,85 +87,38 @@ const HomeComponent = React.createClass({
 		});
 	},
 	createAccount: function(){
+		var self = this
 		var newAccount = {
-			accountName: "",
-			ethAddress: "",
+			id: "",
+			name: "",
+			type: "",
+			ethaddr: "",
 			pass: "",
-			accountType: ""
+			img: "/ipfs/Qma3hV1MLwSMjey2ZyaHaRP4UaKE4m9Hbc4nR8gArD3Rs4",
+			txs: []
 		}
-		newAccount.accountName = this.refs.cname.value
-		newAccount.pass = this.refs.cpass.value
-		newAccount.accountType = this.refs.ctype.value
-		this.setState({
-			modalCreateIsOpen: false,
-			loading: true
-		})
-		if(this.user == undefined){
-			console.log('you are not logged in')
-			var user = new MarketAPI()
-			//not working
-			/*var ee = user.account.getEventEmitter()
-			user.account.createAccount(newAccount, false)
-			user.account.ee.on('createdone',err => {
-	      	console.log('finished initializing api')
-	      	swal({   
-	            title: "Success!",   
-	            text: 'You are now signed in and ready to use the markets',   
-	            type: "info",   
-	            confirmButtonText: "Close" 
-          	});
-	        self.setState({ 
-	        	//loadingImg: "test",
-	        	user: user,
-	        	loading: false
-	        });
-	    })*/
-		}else{
-			console.log('you are logged in')
-			user.account.createAccount(newAccount, true)
-		}
+		newAccount.id = Math.floor(Math.random()*100000000000000000)
+		newAccount.name = self.refs.cname.value
+		newAccount.pass = self.refs.cpass.value
+		newAccount.type = self.refs.ctype.value
+		newAccount.ethaddr = self.props.user.account.getActiveAddr(self.refs.cgethaccount.value)
+		//not working
+		var ee = self.props.user.account.getEventEmitter()
+		var oldAccounts = self.props.userData
+		self.props.user.account.createAccount(newAccount, oldAccounts)
 		//this.initialize()
 		//console.log(this.refs.cname.value)
+		self.setState({
+			modalCreateIsOpen: false
+		})
 	},
 	signIn: function(){
 		var accountNum = this.refs.cgethaccount.value
 		console.log(accountNum)
-		this.state.user.account.setAccount(accountNum)
-		this.setState({modalSignIsOpen: false})
-	},
-	initialize: function(){    
-	    var user = new MarketAPI()
-	    user.account.init()
-	    //example of using the netid api to get the eth balance
-	    var web3test = user.account.getBalance()
-	    console.log('Balance: '+web3test+' Ether')
-		var self = this 
-		console.log('from init function: '+self.props.user)
-	    if(!this.isMounted()) return
-	    var ee = user.account.getEventEmitter()
-	    ee.on('initdone',err => {
-	      if(!err && this.isMounted()){
-	      	console.log('finished initializing api')
-	      	swal({   
-	            title: "Success!",   
-	            text: 'You are now signed in and ready to use the markets',   
-	            type: "info",   
-	            confirmButtonText: "Close" 
-          	});
-	        self.setState({ 
-	        	//loadingImg: "test",
-	        	user: user,
-	        	loading: false
-	        });
-	      }
-	    })
-	    ee.on('initerr',err => {
-	      if(this.isMounted()){
-	        self.setState({ 
-	        	loading: false
-	        });
-	      }
-	    })	
+		this.props.user.eth = accountNum
+		this.setState({
+			modalSignIsOpen: false
+		})
 	},
 	render: function() {
 		return (
@@ -236,8 +193,6 @@ const HomeComponent = React.createClass({
 			            <Link to="/markets"><button onClick={this.signIn}>Sign In!</button></Link>
 
 					</Modal>
-    				<p>In the future you will have more sign in options. Multiple personas based on multiple IPFS IDs and Ethereum accounts are in the works.
-    				   Currently defaults to your go-ipfs client ID and geth account 0</p>
     			</div>
     		</div>
 		</div>

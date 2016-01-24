@@ -7,27 +7,30 @@ const AccountContainer = React.createClass({
 	return { 
 		modalCreateIsOpen: false,
 		modalSignIsOpen: false,
-		loading: true,
-		heading: 'Checking For Account...'
+		loading: false,
+		heading: 'Checking For Account...',
+		user: this.props.user,
+		userData: this.props.userData,
+		activeUserData: {}
 	 };
 	},
-	initialize: function(){	   
-	    var user = new MarketAPI()
-	    user.account.init()
-	    //example of using the netid api to get the eth balance
-	    var web3test = user.account.getBalance()
-	    console.log('Balance: '+web3test+' Ether')
-		var self = this 
-		self.setState({
-			api: user
-		})
+	initialize: function(){
+		var addr = this.props.user.account.getActiveAddr(this.props.user.eth)
+	    for(var i = 0; i < this.props.userData.length; i++){
+	    	if(this.props.userData[i].ethaddr == addr){
+	    		this.setState({
+	    			activeUserData: this.props.userData[i],
+	    			heading: 'Account Found!'
+	    		})
+	    	}
+	    }
+		var self = this
 	    if(!this.isMounted()) return
-	    var ee = user.account.getEventEmitter()
+	    var ee = self.state.user.account.getEventEmitter()
 	    ee.on('initdone',err => {
-	      if(!err && this.isMounted()){
+	      if(!err && self.isMounted()){
 	        self.setState({ 
 	        	loadingImg: "test",
-	        	user: user,
 	        	loading: false,
 	        	heading: 'You Are Logged In!'
 	        });
@@ -47,6 +50,11 @@ const AccountContainer = React.createClass({
 		var tablestyle = {
 			width:'100%'
 	    }
+	    var imgstyle = {
+	    	width: '250px',
+	    	height: '250px'
+	    }
+	    var image = "http://localhost:8080"+this.state.activeUserData.img
 		return (
 		<div>
 		<div className="row">
@@ -57,7 +65,7 @@ const AccountContainer = React.createClass({
     		<h3>Profile</h3>
     			<div className="col-md-8 col-md-offset-2">
     				
-						<img className="thumbnail" src="images/user.png"/>
+						<img className="thumbnail" style={imgstyle} src={image}/>
 						<fieldset className="form-group">
 			                 <label htmlFor="exampleInputFile">Upload an Image</label>
 			                 <div className="col-md-8 col-md-offset-4">
@@ -71,19 +79,23 @@ const AccountContainer = React.createClass({
     				<tbody>
 					  <tr>
 					    <td>Username:</td>
-					    <td>voxelot</td> 
+					    <td>{this.state.activeUserData.name}</td> 
 					  </tr>
 					  <tr>
 					    <td>IPFS ID:</td>
-					    <td>QmYii1eatYx5YEYBBZzAJcVDs6RbmujeyPuqaK8LFfugho</td> 
+					    <td>{this.state.user.account.id}</td> 
 					  </tr>
 					  <tr>
 					    <td>Ethereum Address:</td>
-					    <td>0x87357c51c98ab021708cc769965117efbfdec5f6</td> 
+					    <td>{this.state.activeUserData.ethaddr}</td> 
 					  </tr>
 					  <tr>
 					    <td>Account Balance:</td>
-					    <td>420 Ether</td> 
+					    <td>{this.state.user.account.getBalance(this.state.activeUserData.ethaddr)} Ether</td> 
+					  </tr>
+					  <tr>
+					    <td>Account Type:</td>
+					    <td>{this.state.activeUserData.type}</td> 
 					  </tr>
 					  <tr>
 					    <td>Seller Rating:</td>
